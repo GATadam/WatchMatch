@@ -1,0 +1,45 @@
+*  {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    font-optical-sizing: auto;
+    color: #ffffff;  
+    background-color: #0A0A14;
+}
+
+.header {
+    text-align: center;
+    background-color: #24243C;
+    margin: 10px auto;
+    padding: 5px;
+    width: 400px;
+    border-radius: 10px;
+    align-items: center;
+    font-weight: 500;
+}
+
+.brands {
+    text-align: center;
+    color: #0A0A14;
+    background-color: #494b75; 
+    margin: 10px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.blue-text {
+    font-weight: 800;
+    position:relative;
+    top:-0.05em;
+}
+
+a {
+  color: #0A0A14;
+  text-decoration: none; /* no underline */
+}
