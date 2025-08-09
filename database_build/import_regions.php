@@ -11,7 +11,7 @@ curl_setopt_array($curl, [
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => "GET",
   CURLOPT_HTTPHEADER => [
-    "Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OThmYjY0NDkyNjM1ZTlkNjc4ZDg3MjgwMzdhNTVmZSIsIm5iZiI6MTc1MjU5NjI3Ni40MDcsInN1YiI6IjY4NzY3ZjM0YWFkNDlkMGQ5NzljYjIyOCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.O8gtGIXpvLlrfX3iqxSkQZ4YgnVr_Xp1CspnpZ4vlXA",
+    "Authorization: Bearer " . getenv('TMDB_API_KEY'),
     "accept: application/json"
   ],
 ]);
@@ -26,9 +26,9 @@ if ($err) {
 
 $data = json_decode($response, true);
 
-$dsn = 'mysql:host=localhost;dbname=b29853;charset=utf8mb4';
-$user = 'felhasznalonev';
-$pass = 'jelszo';
+$dsn = 'mysql:host=localhost;dbname=' . getenv('DB_NAME') . ';charset=utf8mb4';
+$user = getenv('DB_USER_NAME');
+$pass = getenv('DB_PASSWORD');
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [
