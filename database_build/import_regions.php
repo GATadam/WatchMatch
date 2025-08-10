@@ -26,7 +26,7 @@ if ($err) {
 
 $data = json_decode($response, true);
 
-$dsn = 'mysql:host=localhost;dbname=' . getenv('DB_NAME') . ';charset=utf8mb4';
+$dsn = 'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_NAME') . ';charset=utf8mb4';
 $user = getenv('DB_USER_NAME');
 $pass = getenv('DB_PASSWORD');
 
@@ -38,12 +38,12 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-$stmt = $pdo->prepare("INSERT INTO countries (iso_code, name) VALUES (?, ?)");
+$stmt = $pdo->prepare("INSERT INTO Region (iso_code, name) VALUES (?, ?)");
 
 foreach ($data['results'] as $country) {
     $iso_code = $country['iso_3166_1'];
     $name = $country['english_name'];
-    $stmt->execute([$iso, $english]);
+    $stmt->execute([$iso_code, $name]);
 }
 
 echo "Sikeres importálás!";
