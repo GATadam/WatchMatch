@@ -1,5 +1,14 @@
 <?php
 
+if (file_exists(__DIR__ . '/.env')) {
+    $lines = file(__DIR__ . '/.env');
+    foreach ($lines as $line) {
+        if (trim($line) && strpos($line, '=') !== false) {
+            putenv(trim($line));
+        }
+    }
+}
+
 $curl = curl_init();
 
 curl_setopt_array($curl, [
@@ -20,6 +29,8 @@ $response = curl_exec($curl);
 $err = curl_error($curl);
 curl_close($curl);
 
+// save the json file
+file_put_contents('regions.json', $response);
 if ($err) {
   die("cURL Error #:" . $err);
 }
@@ -35,10 +46,10 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    die("Database connection failed: " . $e->getMessage() . ". " . getenv('DB_PORT'));
 }
 
-$stmt = $pdo->prepare("INSERT INTO Region (iso_code, name) VALUES (?, ?)");
+$stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE') . " (iso_code, name) VALUES (?, ?)");
 
 foreach ($data['results'] as $country) {
     $iso_code = $country['iso_3166_1'];

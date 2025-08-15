@@ -1,3 +1,5 @@
 .env
 config.php
 *.ppk
+Vizsgaremek.sql
+*.json
