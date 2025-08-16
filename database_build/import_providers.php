@@ -1,5 +1,9 @@
 <?php
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 if (file_exists(__DIR__ . '/.env')) {
     $lines = file(__DIR__ . '/.env');
     foreach ($lines as $line) {
@@ -12,7 +16,7 @@ if (file_exists(__DIR__ . '/.env')) {
 $curl = curl_init();
 
 curl_setopt_array($curl, [
-  CURLOPT_URL => "https://api.themoviedb.org/3/watch/providers/regions?language=en-US",
+  CURLOPT_URL => "https://api.themoviedb.org/3/watch/providers/movie?language=en-US",
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => "",
   CURLOPT_MAXREDIRS => 10,
@@ -27,12 +31,14 @@ curl_setopt_array($curl, [
 
 $response = curl_exec($curl);
 $err = curl_error($curl);
+
 curl_close($curl);
 
-//file_put_contents('regions.json', $response);
+//file_put_contents('providers.json', $response);
 if ($err) {
-  die("cURL Error #:" . $err);
+  echo "cURL Error #:" . $err;
 }
+
 
 $data = json_decode($response, true);
 
@@ -45,15 +51,26 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage() . ". " . getenv('DB_PORT'));
+    die("Database connection failed: " . $e->getMessage());
 }
 
-$stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_R') . " (iso_code, name) VALUES (?, ?)");
+$stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_P') . " (tmdb_id, name, logo) VALUES (?, ?, ?)");
 
-foreach ($data['results'] as $country) {
-    $iso_code = $country['iso_3166_1'];
-    $name = $country['english_name'];
-    $stmt->execute([$iso_code, $name]);
+$providers = [];
+if (file_exists('providers.txt')) {
+    $lines = file('providers.txt');
+    foreach ($lines as $line) {
+        $providers[] = trim($line);
+    }
+}
+
+foreach ($data['results'] as $provider) {
+    if (in_array($provider['provider_name'], $providers)) {
+        $tmdb_id = $provider['provider_id'];
+        $name = $provider['provider_name'];
+        $logo = getenv('IMAGE_ORIGINAL_URL') . $provider['logo_path'];
+        $stmt->execute([$tmdb_id, $name, $logo]);
+    }
 }
 
 echo "Sikeres importálás!";
