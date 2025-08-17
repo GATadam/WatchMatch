@@ -78,6 +78,8 @@ for prov_id in prov_ids:
 
         data = resp.json()
         total_pages = data.get("total_pages", 0)
+        if total_pages > 500:
+            total_pages = 500
 
         all_movies = []
         num = 0
