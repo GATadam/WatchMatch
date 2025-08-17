@@ -87,6 +87,7 @@ for prov_id in prov_ids:
         for i in range(1, total_pages + 1):
             params["page"] = i
             resp = requests.get(url, headers=headers, params=params)
+            # TODO: ha valami nem működik, akkor le kell futtatni újra amíg nem helyes, de max 5 alkalommal
             if resp.status_code != 200:
                 print(f"Error page {i}: {resp.text}")
                 continue
