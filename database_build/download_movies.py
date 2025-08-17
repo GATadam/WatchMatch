@@ -41,7 +41,7 @@ cursor.close()
 conn.close()
 
 with open("ids.txt", "w") as f:
-    f.write("Provider IDs:\n" + "\n".join(prov_ids) + "\n\nRegion Codes:\n" + "\n".join(reg_codes))
+    f.write("Provider IDs:\n" + "\n".join(map(str, prov_ids)) + "\n\nRegion Codes:\n" + "\n".join(reg_codes))
 
 print("Provider IDs:", prov_ids)
 print("Region Codes:", reg_codes)
