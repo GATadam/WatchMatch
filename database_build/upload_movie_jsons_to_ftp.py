@@ -13,3 +13,16 @@ def main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir):
                 ftp.delete(f)
             ftp.storbinary(f"STOR {os.path.basename(json_file)}", f)
             ftp.quit()
+
+
+if os.path.exists(".env"):
+    load_dotenv(".env")
+    
+movies_dir = "movies"
+os.makedirs(movies_dir, exist_ok=True)
+
+FTP_HOST = os.getenv("FTP_HOST")
+FTP_USER = os.getenv("FTP_USER")
+FTP_PASS = os.getenv("FTP_PASSWORD")
+
+main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)
