@@ -54,6 +54,7 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
+$stmt_check = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_P') . " WHERE tmdb_id = ?");
 $stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_P') . " (tmdb_id, name, logo) VALUES (?, ?, ?)");
 
 $providers = [];
@@ -69,7 +70,13 @@ foreach ($data['results'] as $provider) {
         $tmdb_id = $provider['provider_id'];
         $name = $provider['provider_name'];
         $logo = getenv('IMAGE_ORIGINAL_URL') . $provider['logo_path'];
-        $stmt->execute([$tmdb_id, $name, $logo]);
+
+        $stmt_check->execute([$tmdb_id]);
+        $exists = $stmt_check->fetchColumn();
+
+        if ($exists == 0) {
+            $stmt->execute([$tmdb_id, $name, $logo]);
+        }
     }
 }
 

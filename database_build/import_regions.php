@@ -48,13 +48,21 @@ try {
     die("Database connection failed: " . $e->getMessage() . ". " . getenv('DB_PORT'));
 }
 
-$stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_R') . " (iso_code, name) VALUES (?, ?)");
+$stmt_check = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_R') . " WHERE iso_code = ?");
+$stmt_insert = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_R') . " (iso_code, name) VALUES (?, ?)");
 
 foreach ($data['results'] as $country) {
     $iso_code = $country['iso_3166_1'];
     $name = $country['english_name'];
-    $stmt->execute([$iso_code, $name]);
+
+    $stmt_check->execute([$iso_code]);
+    $exists = $stmt_check->fetchColumn();
+
+    if ($exists == 0) {
+        $stmt_insert->execute([$iso_code, $name]);
+    }
 }
+
 
 echo "Sikeres importálás!";
 ?>
