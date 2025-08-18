@@ -5,7 +5,6 @@ import glob
 import requests
 import mysql.connector
 from dotenv import load_dotenv
-import ftplib
 import add_movies_to_db
 import upload_movie_jsons_to_ftp
 
