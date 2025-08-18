@@ -83,8 +83,9 @@ for prov_id in prov_ids:
                 if resp.status_code == 200:
                     break
                 time.sleep(1)
-            print(f"Error fetching page 1: {resp.text}")
-            continue
+            else:
+                print(f"Error fetching page 1: {resp.text}")
+                break # ha nem sikerül az 1.-t leszedni új próbálkozások után sem, a többi sem fog menni
 
         data = resp.json()
         total_pages = data.get("total_pages", 0)
@@ -103,7 +104,7 @@ for prov_id in prov_ids:
                         break
                     time.sleep(1)
                 print(f"Error page {i}: {resp.text}")
-                continue
+                continue # itt nem break, mert ha közte nem sikerül 1 oldal, azért mehetünk tovább
 
             page_data = resp.json()
             all_movies.extend(page_data.get("results", []))
@@ -124,5 +125,9 @@ for prov_id in prov_ids:
 #print("Finish time:", time.strftime("%Y-%m-%d %H:%M:%S"))
 
 upload_movie_jsons_to_ftp.main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)
+
+# a 200 GB-s tárhelyen szabadabban elfér, mint a VPS 40 GB-jén
+for f in glob.glob(f"{movies_dir}/*.json"):
+    os.remove(f)
 
 add_movies_to_db.main()
