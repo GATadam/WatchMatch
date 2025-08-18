@@ -1,6 +1,7 @@
 import os
 import glob
 import ftplib
+from dotenv import load_dotenv
 
 
 def main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir):
