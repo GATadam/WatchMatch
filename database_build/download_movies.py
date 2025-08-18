@@ -54,7 +54,7 @@ print("Region Codes:", reg_codes)
 movies_dir = "movies"
 os.makedirs(movies_dir, exist_ok=True)
 
-for f in glob.glob(f"{movies_dir}/*.*"):
+for f in glob.glob(f"{movies_dir}/*.json"):
     os.remove(f)
 
 headers = {
