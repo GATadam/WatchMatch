@@ -45,11 +45,11 @@ reg_codes = [row[0] for row in cursor.fetchall()]
 cursor.close()
 conn.close()
 
-with open("ids.txt", "w") as f:
+"""with open("ids.txt", "w") as f:
     f.write("Provider IDs:\n" + "\n".join(map(str, prov_ids)) + "\n\nRegion Codes:\n" + "\n".join(reg_codes))
 
 print("Provider IDs:", prov_ids)
-print("Region Codes:", reg_codes)
+print("Region Codes:", reg_codes)"""
 
 movies_dir = "movies"
 os.makedirs(movies_dir, exist_ok=True)
@@ -65,7 +65,7 @@ headers = {
 for prov_id in prov_ids:
     for reg_code in reg_codes:
         print(f"Provider ID: {prov_id}, Region Code: {reg_code}")
-        url = f"https://api.themoviedb.org/3/discover/movie"
+        url = "https://api.themoviedb.org/3/discover/movie"
         params = {
             "include_adult": "false",
             "include_video": "false",
@@ -92,7 +92,6 @@ for prov_id in prov_ids:
             total_pages = 500
 
         all_movies = []
-        num = 0
 
         for i in range(1, total_pages + 1):
             params["page"] = i
@@ -109,19 +108,18 @@ for prov_id in prov_ids:
             page_data = resp.json()
             all_movies.extend(page_data.get("results", []))
 
-            filename = f"{movies_dir}/movies_{reg_code}_{prov_id}_{num:04d}.json"
+            """filename = f"{movies_dir}/movies_{reg_code}_{prov_id}_{i:04d}.json"
             with open(filename, "w", encoding="utf-8") as f:
-                json.dump(page_data, f, indent=2, ensure_ascii=False)
+                json.dump(page_data, f, indent=2, ensure_ascii=False)"""
 
-            num += 1
             time.sleep(0.1)
 
         merged_file = f"{movies_dir}/movies_all_{reg_code}_{prov_id}.json"
         with open(merged_file, "w", encoding="utf-8") as f:
             json.dump({"results": all_movies}, f, indent=2, ensure_ascii=False)
 
-        for f in glob.glob(f"{movies_dir}/movies_{reg_code}_{prov_id}_*.json"):
-            os.remove(f)
+        """for f in glob.glob(f"{movies_dir}/movies_{reg_code}_{prov_id}_*.json"):
+            os.remove(f)"""
 
 #print("Finish time:", time.strftime("%Y-%m-%d %H:%M:%S"))
 
