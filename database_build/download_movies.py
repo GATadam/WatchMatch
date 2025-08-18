@@ -5,8 +5,11 @@ import glob
 import requests
 import mysql.connector
 from dotenv import load_dotenv
+import ftplib
+import add_movies_to_db
+import upload_movie_jsons_to_ftp
 
-print("Start time:", time.strftime("%Y-%m-%d %H:%M:%S"))
+#print("Start time:", time.strftime("%Y-%m-%d %H:%M:%S"))
 
 if os.path.exists(".env"):
     load_dotenv(".env")
@@ -18,6 +21,9 @@ DB_PASS = os.getenv("DB_PASSWORD")
 TABLE_P = os.getenv("DB_TABLE_P")
 TABLE_R = os.getenv("DB_TABLE_R")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+FTP_HOST = os.getenv("FTP_HOST")
+FTP_USER = os.getenv("FTP_USER")
+FTP_PASS = os.getenv("FTP_PASSWORD")
 
 try:
     conn = mysql.connector.connect(
@@ -73,6 +79,11 @@ for prov_id in prov_ids:
 
         resp = requests.get(url, headers=headers, params=params)
         if resp.status_code != 200:
+            for j in range(5):
+                resp = requests.get(url, headers=headers, params=params)
+                if resp.status_code == 200:
+                    break
+                time.sleep(1)
             print(f"Error fetching page 1: {resp.text}")
             continue
 
@@ -87,8 +98,12 @@ for prov_id in prov_ids:
         for i in range(1, total_pages + 1):
             params["page"] = i
             resp = requests.get(url, headers=headers, params=params)
-            # TODO: ha valami nem működik, akkor le kell futtatni újra amíg nem helyes, de max 5 alkalommal
             if resp.status_code != 200:
+                for j in range(5):
+                    resp = requests.get(url, headers=headers, params=params)
+                    if resp.status_code == 200:
+                        break
+                    time.sleep(1)
                 print(f"Error page {i}: {resp.text}")
                 continue
 
@@ -109,4 +124,8 @@ for prov_id in prov_ids:
         for f in glob.glob(f"{movies_dir}/movies_{reg_code}_{prov_id}_*.json"):
             os.remove(f)
 
-print("Finish time:", time.strftime("%Y-%m-%d %H:%M:%S"))
+#print("Finish time:", time.strftime("%Y-%m-%d %H:%M:%S"))
+
+upload_movie_jsons_to_ftp.main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)
+
+add_movies_to_db.main()
