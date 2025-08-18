@@ -114,7 +114,7 @@ for prov_id in prov_ids:
                 json.dump(page_data, f, indent=2, ensure_ascii=False)
 
             num += 1
-            time.sleep(0.001)
+            time.sleep(0.1)
 
         merged_file = f"{movies_dir}/movies_all_{reg_code}_{prov_id}.json"
         with open(merged_file, "w", encoding="utf-8") as f:
