@@ -11,11 +11,12 @@ def main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir):
             ftp.login(FTP_USER, FTP_PASS)
             ftp.cwd("www/watchmatch_jsons/movies")
             for file in ftp.nlst():
-                    if file not in ('.', '..'):
-                        try:
-                            ftp.delete(file)
-                        except ftplib.error_perm as e:
-                            print(f"Could not delete {file}: {e}")
+                name = os.path.basename(file)
+                if name not in ('.', '..') and not file.endswith('/'):
+                    try:
+                        ftp.delete(file)
+                    except ftplib.error_perm as e:
+                        print(f"Could not delete {file}: {e}")
             ftp.storbinary(f"STOR {os.path.basename(json_file)}", f)
             ftp.quit()
 
