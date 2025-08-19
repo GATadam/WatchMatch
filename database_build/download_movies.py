@@ -19,10 +19,14 @@ DB_USER = os.getenv("DB_USER_NAME")
 DB_PASS = os.getenv("DB_PASSWORD")
 TABLE_P = os.getenv("DB_TABLE_P")
 TABLE_R = os.getenv("DB_TABLE_R")
+TABLE_M = os.getenv("DB_TABLE_M")
+TABLE_W2W = os.getenv("DB_TABLE_W2W")
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 FTP_HOST = os.getenv("FTP_HOST")
 FTP_USER = os.getenv("FTP_USER")
 FTP_PASS = os.getenv("FTP_PASSWORD")
+JSON_FOLDER = os.getenv("JSON_FOLDER")
+IMAGE_ORIGINAL_URL = os.getenv("IMAGE_ORIGINAL_URL")
 
 try:
     conn = mysql.connector.connect(
@@ -130,4 +134,4 @@ upload_movie_jsons_to_ftp.main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)
 for f in glob.glob(f"{movies_dir}/*.json"):
     os.remove(f)
 
-add_movies_to_db.main()
+add_movies_to_db.main(DB_HOST, DB_USER, DB_PASS, DB_NAME, TABLE_P, TABLE_R, TABLE_M, TABLE_W2W, IMAGE_ORIGINAL_URL, JSON_FOLDER)
