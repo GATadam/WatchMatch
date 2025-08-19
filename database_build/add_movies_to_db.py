@@ -42,31 +42,17 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
             data = response.json()
             for movie in data.get("results", []):
                 cursor.execute(f"SELECT id FROM {DB_TABLE_M} WHERE tmdb_id = {movie.get('id')}")
-                in_db = cursor.fetchone()
-                if in_db is None:
+                db_m_id = cursor.fetchone()
+                if db_m_id is None:
                     cursor.execute(f"INSERT INTO {DB_TABLE_M} (tmdb_id, title, popularity, picture) VALUES ({movie.get('id')}, {movie.get('title')}, {movie.get('popularity')}, {IMAGE_ORIGINAL_URL + movie.get('poster_path')})")
                     conn.commit()
-                    cursor.execute(f"SELECT id FROM {DB_TABLE_M} WHERE tmdb_id = {movie.get('id')}")
-                    db_m_id = cursor.fetchone()
-                    cursor.execute(f"INSERT INTO temp_W2W (provider_id, region_code, movie_id) VALUES ({db_p_id[0]}, {db_r_id[0]}, {db_m_id[0]})")
-                    conn.commit()
-                else:
-                    pass
+                cursor.execute(f"INSERT INTO temp_W2W (provider_id, region_code, movie_id) VALUES ({db_p_id[0]}, {db_r_id[0]}, {db_m_id[0]})")
+                conn.commit()
+    
     cursor.execute(f"DELETE FROM {DB_TABLE_W2W}")
     cursor.execute(f"INSERT INTO {DB_TABLE_W2W} (provider_id, region_code, movie_id) SELECT provider_id, region_code, movie_id FROM temp_W2W")
     cursor.execute("DROP TABLE temp_W2W")
-    conn.commit()
-
-    # beolvasni a JSON fájlokat
-    """for json_file in glob.glob(f"{JSON_FOLDER}/*.json"):
-        with open(json_file, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        # feldolgozni a filmeket
-        for movie in data.get("results", []):
-            # beszúrni a film adatait az adatbázisba
-            cursor.execute(f"INSERT INTO {DB_TABLE_M} (title, overview, release_date, poster_path) VALUES (%s, %s, %s, %s)",
-                           (movie["title"], movie["overview"], movie["release_date"], IMAGE_ORIGINAL_URL + movie["poster_path"]))"""
+    
     conn.commit()
     cursor.close()
     conn.close()
