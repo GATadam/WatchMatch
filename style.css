@@ -43,3 +43,9 @@ a {
   color: #0A0A14;
   text-decoration: none; /* no underline */
 }
+
+#tmdb-logo {
+    width: 50px !important;
+    height: auto !important;
+    display: inline-block;
+}
