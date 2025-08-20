@@ -6,3 +6,5 @@ Vizsgaremek.sql
 comment.txt
 ids.txt
 venv/
+time.txt
+__pycache__/
