@@ -103,12 +103,15 @@ for prov_id in prov_ids:
             resp = requests.get(url, headers=headers, params=params)
             if resp.status_code != 200:
                 for j in range(5):
+                    print(f"Error page {i}: {resp.text}")
                     resp = requests.get(url, headers=headers, params=params)
                     if resp.status_code == 200:
+                        print(f"Successfully fetched page {i} after retrying {j} times.")
                         break
                     time.sleep(1)
-                print(f"Error page {i}: {resp.text}")
-                continue # itt nem break, mert ha közte nem sikerül 1 oldal, azért mehetünk tovább
+                else:
+                    print(f"Error page {i}: {resp.text}")
+                    continue # itt nem break, mert ha közte nem sikerül 1 oldal, azért mehetünk tovább
 
             page_data = resp.json()
             all_movies.extend(page_data.get("results", []))
