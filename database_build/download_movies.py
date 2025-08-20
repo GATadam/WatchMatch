@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import add_movies_to_db
 import upload_movie_jsons_to_ftp
 
-#print("Start time:", time.strftime("%Y-%m-%d %H:%M:%S"))
+start_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
 if os.path.exists(".env"):
     load_dotenv(".env")
@@ -126,7 +126,6 @@ for prov_id in prov_ids:
         """for f in glob.glob(f"{movies_dir}/movies_{reg_code}_{prov_id}_*.json"):
             os.remove(f)"""
 
-#print("Finish time:", time.strftime("%Y-%m-%d %H:%M:%S"))
 
 upload_movie_jsons_to_ftp.main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)
 
@@ -135,3 +134,10 @@ for f in glob.glob(f"{movies_dir}/*.json"):
     os.remove(f)
 
 add_movies_to_db.main(DB_HOST, DB_USER, DB_PASS, DB_NAME, TABLE_P, TABLE_R, TABLE_M, TABLE_W2W, IMAGE_ORIGINAL_URL, JSON_FOLDER)
+
+finish_time = time.strftime("%Y-%m-%d %H:%M:%S")
+
+with open("time.txt", "w") as f:
+    f.write(f"Start time: {start_time}\n")
+    f.write(f"Finish time: {finish_time}\n")
+    f.write(f"Elapsed time: {time.strftime('%H:%M:%S', time.gmtime(time.time() - start_time))}\n")
