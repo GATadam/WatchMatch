@@ -40,6 +40,8 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
             db_p_id = cursor.fetchone()[0]
             cursor.execute(f"SELECT id FROM {DB_TABLE_R} WHERE iso_code = '{region_code}'")
             db_r_id = cursor.fetchone()[0]
+            if not response.json().get("results"):
+                continue
             data = response.json()
             for movie in data.get("results", []):
                 cursor.execute(f"SELECT id FROM {DB_TABLE_M} WHERE tmdb_id = {movie.get('id')}")
