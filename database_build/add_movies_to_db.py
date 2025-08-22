@@ -45,7 +45,16 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
                 cursor.execute(f"SELECT id FROM {DB_TABLE_M} WHERE tmdb_id = {movie.get('id')}")
                 db_m_id = cursor.fetchone()
                 if db_m_id is None:
-                    cursor.execute(f"INSERT INTO {DB_TABLE_M} (tmdb_id, title, popularity, picture) VALUES ({movie.get('id')}, {movie.get('title')}, {movie.get('popularity')}, {IMAGE_ORIGINAL_URL + movie.get('poster_path')})")
+                    # cursor.execute(f"INSERT INTO {DB_TABLE_M} (tmdb_id, title, popularity, picture) VALUES ({movie.get('id')}, {movie.get('title')}, {movie.get('popularity')}, {IMAGE_ORIGINAL_URL + movie.get('poster_path')})")
+                    cursor.execute(f"INSERT INTO {DB_TABLE_M} (tmdb_id, title, popularity, picture) VALUES (%s, %s, %s, %s)",
+                        (
+                            movie.get('id'),
+                            movie.get('title'),
+                            movie.get('popularity'),
+                            IMAGE_ORIGINAL_URL + movie.get('poster_path')
+                        )
+                    )
+                    # elméletileg a 2 insert közötta  különbség az, hogy ezt a második verziót értelmezi helyesen a mysql és tesz idézőjeleket a stringekhez
                     conn.commit()
                 cursor.execute(f"INSERT INTO temp_W2W (provider_id, region_code, movie_id) VALUES ({db_p_id[0]}, {db_r_id[0]}, {db_m_id[0]})")
                 conn.commit()
