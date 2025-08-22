@@ -56,6 +56,8 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
                     )
                     # elméletileg a 2 insert közötta  különbség az, hogy ezt a második verziót értelmezi helyesen a mysql és tesz idézőjeleket a stringekhez
                     conn.commit()
+                    cursor.execute(f"SELECT id FROM {DB_TABLE_M} WHERE tmdb_id = {movie.get('id')}")
+                    db_m_id = cursor.fetchone()
                 cursor.execute(f"INSERT INTO temp_W2W (provider_id, regio_id, movie_id) VALUES ({db_p_id}, {db_r_id}, {db_m_id[0]})")
                 conn.commit()
     
