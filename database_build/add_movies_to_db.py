@@ -1,5 +1,6 @@
 from glob import glob
 import json
+import os
 import time
 from dotenv import load_dotenv
 import mysql.connector
@@ -57,3 +58,23 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
     cursor.close()
     conn.close()
 
+
+if os.path.exists(".env"):
+    load_dotenv(".env")
+
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER_NAME")
+DB_PASS = os.getenv("DB_PASSWORD")
+TABLE_P = os.getenv("DB_TABLE_P")
+TABLE_R = os.getenv("DB_TABLE_R")
+TABLE_M = os.getenv("DB_TABLE_M")
+TABLE_W2W = os.getenv("DB_TABLE_W2W")
+TMDB_API_KEY = os.getenv("TMDB_API_KEY")
+FTP_HOST = os.getenv("FTP_HOST")
+FTP_USER = os.getenv("FTP_USER")
+FTP_PASS = os.getenv("FTP_PASSWORD")
+JSON_FOLDER = os.getenv("JSON_FOLDER")
+IMAGE_ORIGINAL_URL = os.getenv("IMAGE_ORIGINAL_URL")
+
+main(DB_HOST, DB_USER, DB_PASS, DB_NAME, TABLE_P, TABLE_R, TABLE_M, TABLE_W2W, IMAGE_ORIGINAL_URL, JSON_FOLDER)
