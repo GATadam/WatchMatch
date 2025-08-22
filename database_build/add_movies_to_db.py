@@ -56,7 +56,7 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
                     )
                     # elméletileg a 2 insert közötta  különbség az, hogy ezt a második verziót értelmezi helyesen a mysql és tesz idézőjeleket a stringekhez
                     conn.commit()
-                cursor.execute(f"INSERT INTO temp_W2W (provider_id, region_code, movie_id) VALUES ({db_p_id[0]}, {db_r_id[0]}, {db_m_id[0]})")
+                cursor.execute(f"INSERT INTO temp_W2W (provider_id, region_code, movie_id) VALUES ({db_p_id}, {db_r_id}, {db_m_id})")
                 conn.commit()
     
     cursor.execute(f"DELETE FROM {DB_TABLE_W2W}")
