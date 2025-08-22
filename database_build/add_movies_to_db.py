@@ -42,7 +42,11 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
             db_r_id = cursor.fetchone()[0]
             if not response.json().get("results"):
                 continue
-            data = response.json()
+            try:
+                data = response.json()
+            except Exception as e:
+                print(f"Hibás JSON: {provider_id}_{region_code}.json - {e}")
+                quit()
             for movie in data.get("results", []):
                 cursor.execute(f"SELECT id FROM {DB_TABLE_M} WHERE tmdb_id = {movie.get('id')}")
                 db_m_id = cursor.fetchone()
