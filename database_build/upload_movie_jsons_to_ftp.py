@@ -21,7 +21,7 @@ def main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir):
     ftp.quit()
 
 
-if os.path.exists(".env"):
+"""if os.path.exists(".env"):
     load_dotenv(".env")
     
 movies_dir = "movies"
@@ -31,4 +31,4 @@ FTP_HOST = os.getenv("FTP_HOST")
 FTP_USER = os.getenv("FTP_USER")
 FTP_PASS = os.getenv("FTP_PASSWORD")
 
-main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)
+main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir)"""

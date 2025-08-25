@@ -73,7 +73,7 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
     conn.close()
 
 
-if os.path.exists(".env"):
+"""if os.path.exists(".env"):
     load_dotenv(".env")
 
 DB_HOST = os.getenv("DB_HOST")
@@ -91,4 +91,4 @@ FTP_PASS = os.getenv("FTP_PASSWORD")
 JSON_FOLDER = os.getenv("JSON_FOLDER")
 IMAGE_ORIGINAL_URL = os.getenv("IMAGE_ORIGINAL_URL")
 
-main(DB_HOST, DB_USER, DB_PASS, DB_NAME, TABLE_P, TABLE_R, TABLE_M, TABLE_W2W, IMAGE_ORIGINAL_URL, JSON_FOLDER)
+main(DB_HOST, DB_USER, DB_PASS, DB_NAME, TABLE_P, TABLE_R, TABLE_M, TABLE_W2W, IMAGE_ORIGINAL_URL, JSON_FOLDER)"""
