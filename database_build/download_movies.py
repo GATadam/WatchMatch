@@ -36,6 +36,7 @@ try:
         database=DB_NAME
     )
     cursor = conn.cursor()
+    print("Database connection successful.")
 except Exception as e:
     print("Database connection failed:", e)
     exit(1)
