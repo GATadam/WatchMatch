@@ -17,9 +17,10 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
                 database=DB_NAME
             )
             cursor = conn.cursor()
+            print("Database connection successful.", flush=True)
             break
         except mysql.connector.Error as err:
-            print("Error connecting to database:", err)
+            print("Error connecting to database:", err, flush=True)
             time.sleep(5)
     else:
         return
@@ -46,7 +47,7 @@ def main(DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_TABLE_P, DB_TABLE_R, DB_TABLE_M,
                 db_m_id = cursor.fetchone()
                 if db_m_id is None:
                     if not movie.get('poster_path'):
-                        print(f"Movie {movie.get('id')}, {movie.get('title')} has no poster.")
+                        print(f"Movie {movie.get('id')}, {movie.get('title')} has no poster.", flush=True)
                         continue # ha nincs poszter, úgysem tudjuk megjeleníteni
                     # cursor.execute(f"INSERT INTO {DB_TABLE_M} (tmdb_id, title, popularity, picture) VALUES ({movie.get('id')}, {movie.get('title')}, {movie.get('popularity')}, {IMAGE_ORIGINAL_URL + movie.get('poster_path')})")
                     cursor.execute(f"INSERT INTO {DB_TABLE_M} (tmdb_id, title, popularity, picture) VALUES (%s, %s, %s, %s)",

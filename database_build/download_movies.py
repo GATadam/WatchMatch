@@ -36,9 +36,9 @@ try:
         database=DB_NAME
     )
     cursor = conn.cursor()
-    print("Database connection successful.")
+    print("Database connection successful.", flush=True)
 except Exception as e:
-    print("Database connection failed:", e)
+    print("Database connection failed:", e, flush=True)
     exit(1)
 
 cursor.execute(f"SELECT tmdb_id FROM {TABLE_P}")
@@ -69,7 +69,7 @@ headers = {
 
 for prov_id in prov_ids:
     for reg_code in reg_codes:
-        print(f"Provider ID: {prov_id}, Region Code: {reg_code}")
+        print(f"Provider ID: {prov_id}, Region Code: {reg_code}", flush=True)
         url = "https://api.themoviedb.org/3/discover/movie"
         params = {
             "include_adult": "false",
@@ -89,7 +89,7 @@ for prov_id in prov_ids:
                     break
                 time.sleep(1)
             else:
-                print(f"Error fetching page 1: {resp.text}")
+                print(f"Error fetching page 1: {resp.text}", flush=True)
                 break # ha nem sikerül az 1.-t leszedni új próbálkozások után sem, a többi sem fog menni
 
         data = resp.json()
@@ -107,11 +107,11 @@ for prov_id in prov_ids:
                     print(f"Error page {i}: {resp.text}")
                     resp = requests.get(url, headers=headers, params=params)
                     if resp.status_code == 200:
-                        print(f"Successfully fetched page {i} after retrying {j} times.")
+                        print(f"Successfully fetched page {i} after retrying {j} times.", flush=True)
                         break
                     time.sleep(1)
                 else:
-                    print(f"Error page {i}: {resp.text}")
+                    print(f"Error page {i}: {resp.text}", flush=True)
                     continue # itt nem break, mert ha közte nem sikerül 1 oldal, azért mehetünk tovább
 
             page_data = resp.json()

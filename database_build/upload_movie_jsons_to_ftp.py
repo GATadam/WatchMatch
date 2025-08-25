@@ -14,7 +14,7 @@ def main(FTP_HOST, FTP_USER, FTP_PASS, movies_dir):
             try:
                 ftp.delete(file)
             except ftplib.error_perm as e:
-                print(f"Could not delete {file}: {e}")
+                print(f"Could not delete {file}: {e}", flush=True)
     for json_file in glob.glob(f"{movies_dir}/*.json"):
         with open(json_file, "rb") as f:
             ftp.storbinary(f"STOR {os.path.basename(json_file)}", f)
