@@ -121,3 +121,13 @@ input:focus {
     border-color: #7f1d1d;
     color: #fecaca;
 }
+
+.eye-icon {
+    position: relative;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}

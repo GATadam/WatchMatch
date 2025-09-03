@@ -10,3 +10,8 @@ time.txt
 __pycache__/
 output.log
 test.php
+test_mail.php
+*.svg
+*.jpg
+*.png
+images/
