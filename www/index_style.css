@@ -1,0 +1,43 @@
+.header { /* felül írja amit kell */
+    text-align: center;
+    align-items: center;
+}
+
+.brands {
+    text-align: center;
+    margin: 10px;
+    padding: 5px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #374151;
+    background: #0b1220;
+    color: #e2e8f0;
+}
+
+.brands a {
+    color: #ffffff;
+    background-color: #374151;
+    font-weight: 600;
+
+    text-decoration: none; /* no underline */
+    border-radius: 4px;
+    padding:3px 10px 3px 10px;
+    margin: 0px;
+    letter-spacing: 1px;
+}
+
+#tmdb-logo {
+    width: 50px !important;
+    height: auto !important;
+    display: inline-block;
+}
+
+.tmdb_logo_style {
+    padding: 10px;
+}
+
+.login_btn_container {
+    text-align: center;
+    margin: 30px auto 10px auto;
+}
+

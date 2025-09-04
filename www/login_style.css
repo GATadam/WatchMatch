@@ -1,42 +1,25 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    color: #ffffff;  
-    background-color: #0A0A14;
-    margin: 0;
-}
-
-.container {
-    max-width: 460px;
-    margin: 8vh auto;
-    background: #111827;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
-    padding: 24px;
-}
-
-.tabs {
+.login_tabs {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     margin-bottom: 16px;
 }
 
+/* a login és a create account gombok */
 .tab {
-    background: #1f2937;
+    background: #2ac6d9;
     color: #e5e7eb;
     border: none;
     padding: 12px;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    -webkit-text-stroke: 0.5px #555;
 }
 
 .tab.active {
-    background: #2563eb;
+    background: #9620db;
     color: white;
 }
 
@@ -61,11 +44,11 @@ body {
     }
 }
 
-.field {
+.login_field {
     display: grid;
     gap: 6px;
     margin-bottom: 14px;
-    position: relative; /* a szem kép elhelyezése miatt, a grid miatt azt elcsúsztatja */
+    position: relative; /* a szem kép elhelyezése miatt kell, mert a grid miatt azt elcsúsztatja */
 }
 
 label {
@@ -95,21 +78,6 @@ input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 100px #0b1220 inset !important;
     box-shadow: 0 0 0 100px #0b1220 inset !important;
     border: 1px solid #374151 !important;
-}
-
-.btn {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: #2563eb;
-    color: white;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.btn:hover {
-    filter: brightness(1.1);
 }
 
 .hint {

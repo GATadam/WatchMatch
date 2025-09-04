@@ -4,24 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WATCHMATCH - Login</title>
+    <link rel="icon" type="image/x-icon" href="https://www.kosmicdoom.com/watchmatch_media/logo.png">
+    <link rel="stylesheet" href="main_style.css">
     <link rel="stylesheet" href="login.css">
-    <script src='functions.js' defer></script>       
+    <script src='login_reg_front.js' defer></script>
+    <link rel="stylesheet" href="login_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-        <div class="container">
-            <div class="tabs">
+        <div class="header">
+            <div class="login_tabs">
                 <button id="tab_login" class="tab active">Login</button>
                 <button id="tab_register" class="tab">Create Account</button>
             </div>
         
             <div id="login" class="panel active">
                 <form method="POST" action="login.php">
-                    <div class="field">
-                        <label for="email_login">Email</label>
-                        <input id="email_login" name="email" type="email" required />
+                    <div class="login_field">
+                        <label for="username_login">Username</label>
+                        <input id="username_login" name="username" type="text" required />
                         <!-- TODO A required-et nyelvesíteni kell! -->
                     </div>
-                    <div class="field">
+                    <div class="login_field">
                         <label for="password_login">Password</label>
                         <div class="password_container">
                             <input id="password_login" name="password" type="password" minlength="8" required />
@@ -35,22 +41,22 @@
         
             <div id="register" class="panel">
                 <form method="POST" action="register.php">
-                    <div class="field">
+                    <div class="login_field">
                         <label for="username_register">User name</label>
                         <input id="username_register" name="username" type="text" required />
                     </div>
-                    <div class="field">
+                    <div class="login_field">
                         <label for="email_register">Email</label>
                         <input id="email_register" name="email" type="email" required />
                     </div>
-                    <div class="field">
+                    <div class="login_field">
                         <label for="password_register">Password (min. 8 character)</label>
                         <div class="password_container">
                             <input id="password_register" name="password" type="password" minlength="8" required />
                             <img src="https://www.kosmicdoom.com/watchmatch_media/show_pw.svg" alt="Show password" class="eye-icon" />
                         </div>
                     </div>
-                    <div class="field">
+                    <div class="login_field">
                         <label for="region_register">Choose your watch region. <span id="region_info">You can change this later</span></label>
                         <select id="region_register" name="region" required>
                             
@@ -60,6 +66,9 @@
                     <p class="hint">After registration, you will receive a confirmation link by email.</p>
                 </form>
             </div>
+        </div>
+        <div id="logo">
+            <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
         </div>
 </body>
 </html>

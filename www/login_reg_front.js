@@ -3,7 +3,7 @@ const tabRegister = document.getElementById('tab_register');
 const loginPanel = document.getElementById('login');
 const registerPanel = document.getElementById('register');
 
-const emailLogin = document.getElementById('email_login');
+const usernameLogin = document.getElementById('username_login');
 const passwordLogin = document.getElementById('password_login');
 const passwordRegister = document.getElementById('password_register');
 
@@ -11,8 +11,8 @@ const eyeIcons = document.querySelectorAll('.eye-icon');
 
 const regionSelect = document.getElementById('region_register');
 
-passwordLogin.style.width = emailLogin.offsetWidth + "px";
-passwordRegister.style.width = emailLogin.offsetWidth + "px";
+passwordLogin.style.width = usernameLogin.offsetWidth + "px";
+passwordRegister.style.width = usernameLogin.offsetWidth + "px";
 
 // a grid miatt kell a méret beállítás, mert a képet is egy gridelemnek venné
 
@@ -79,5 +79,29 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         registerForm.submit();
+    });
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const loginForm = document.querySelector('#login form');
+    loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(loginForm);
+        const response = await fetch('check_username_password.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+
+        if (data.valid) {
+            window.location.href = 'index.php';
+        } else {
+            alert('Invalid username or password.');
+            return;
+        }
+
+        loginForm.submit();
     });
 });
