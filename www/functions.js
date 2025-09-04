@@ -39,3 +39,31 @@ tabRegister.addEventListener('click', () => {
     registerPanel.classList.add('active');
     loginPanel.classList.remove('active');
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const registerForm = document.querySelector('#register form');
+    registerForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username_register').value.trim();
+        const email = document.getElementById('email_register').value.trim();
+
+        const usernameResponse = await fetch('check_username.php?username=' + encodeURIComponent(username));
+        const usernameData = await usernameResponse.json();
+
+        if (usernameData.exists) {
+            alert('This username is already taken!');
+            return;
+        }
+
+        const emailResponse = await fetch('check_email.php?email=' + encodeURIComponent(email));
+        const emailData = await emailResponse.json();
+
+        if (emailData.exists) {
+            alert('This email is already registered!');
+            return;
+        }
+
+        registerForm.submit();
+    });
+});
