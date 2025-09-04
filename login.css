@@ -65,6 +65,7 @@ body {
     display: grid;
     gap: 6px;
     margin-bottom: 14px;
+    position: relative; /* a szem kép elhelyezése miatt, a grid miatt azt elcsúsztatja */
 }
 
 label {
@@ -73,7 +74,7 @@ label {
 }
 
 input {
-    padding: 12px;
+    padding: 12px 100px 12px 12px;
     border-radius: 10px;
     border: 1px solid #374151;
     background: #0b1220;
@@ -123,9 +124,9 @@ input:focus {
 }
 
 .eye-icon {
-    position: relative;
-    right: 40px;
-    top: 50%;
+    position: absolute;
+    right: 10px;
+    top: 68%;
     transform: translateY(-50%);
     width: 24px;
     height: 24px;
