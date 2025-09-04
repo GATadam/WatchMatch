@@ -7,12 +7,15 @@ const emailLogin = document.getElementById('email_login');
 const passwordLogin = document.getElementById('password_login');
 const passwordRegister = document.getElementById('password_register');
 
+const eyeIcons = document.querySelectorAll('.eye-icon');
+
+const regionSelect = document.getElementById('region_register');
+
 passwordLogin.style.width = emailLogin.offsetWidth + "px";
 passwordRegister.style.width = emailLogin.offsetWidth + "px";
 
 // a grid miatt kell a méret beállítás, mert a képet is egy gridelemnek venné
 
-const eyeIcons = document.querySelectorAll('.eye-icon');
 eyeIcons.forEach(icon => {
     icon.addEventListener('click', () => {
         let passwordInput = icon.previousElementSibling;
@@ -25,6 +28,17 @@ eyeIcons.forEach(icon => {
         }
     });
 });
+
+fetch('get_regions.php')
+    .then(response => response.json())
+    .then(data => {
+        data.forEach(region => {
+            const option = document.createElement('option');
+            option.value = region.id;
+            option.textContent = region.name;
+            regionSelect.appendChild(option);
+        });
+    });
 
 tabLogin.addEventListener('click', () => {
     tabLogin.classList.add('active');

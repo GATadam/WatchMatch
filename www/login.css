@@ -87,6 +87,16 @@ input:focus {
     box-shadow: 0 0 0 3px rgba(37, 99, 235, .2);
 }
 
+input:-webkit-autofill {
+    background: #0b1220 !important;
+    color: #e2e8f0 !important;
+    caret-color: #e2e8f0 !important;
+    -webkit-text-fill-color: #e2e8f0 !important;
+    -webkit-box-shadow: 0 0 0 100px #0b1220 inset !important;
+    box-shadow: 0 0 0 100px #0b1220 inset !important;
+    border: 1px solid #374151 !important;
+}
+
 .btn {
     width: 100%;
     padding: 12px;
@@ -131,4 +141,18 @@ input:focus {
     width: 24px;
     height: 24px;
     cursor: pointer;
+}
+
+#region_info {
+    font-size: 12px;
+    color: #7979ff;
+}
+
+#region_register {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #374151;
+    background: #0b1220;
+    color: #e2e8f0;
 }

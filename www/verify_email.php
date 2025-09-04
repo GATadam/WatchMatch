@@ -29,7 +29,7 @@ if (!isset($_GET['token']) || trim($_GET['token']) === '') {
 
 $token = trim($_GET['token']);
 
-$stmt = $pdo->prepare("SELECT id, email_verified FROM Users WHERE verify_token = ?");
+$stmt = $pdo->prepare("SELECT id, email_verified FROM Users WHERE verification_token = ?");
 $stmt->execute([$token]);
 $user = $stmt->fetch();
 
@@ -43,7 +43,7 @@ if ($user['email_verified']) {
     exit;
 }
 
-$stmt = $pdo->prepare("UPDATE Users SET email_verified = 1, verify_token = NULL WHERE id = ?");
+$stmt = $pdo->prepare("UPDATE Users SET email_verified = 1, verification_token = NULL WHERE id = ?");
 $stmt->execute([$user['id']]);
 
 echo "Your email has been successfully verified. You can now log in.";
