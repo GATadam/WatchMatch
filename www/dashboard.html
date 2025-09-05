@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WATCHMATCH - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="https://www.kosmicdoom.com/watchmatch_media/logo.png">
+    <link rel="stylesheet" href="styles/main_style.css">
+    <link rel="stylesheet" href="styles/dashboard_style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- betűtípus az ikonokhoz, most ez egy placeholder -->
+    <link rel="stylesheet" href="fonts/be_happy_font.css">
+</head>
+<body>
+    <div class='header'>
+        <h1>WATCHMATCH</h1>
+    </div>
+    <div id="side_menu">
+        <table>
+            <tr>
+                <th><span id="profile_icon">k</span></th> <!-- majd php tölti be, csak 1 karakter, angol abc bármelyik betűje lehet -->
+            </tr>
+            <tr>
+                <td id="username">Username</td>
+            </tr>
+            <tr>
+                <td><a href="dashboard.html">Profile</a></td>
+            </tr>
+            <tr>
+                <td><a href="profile.html">Friends</a></td>
+            </tr>
+            <tr>
+                <td><a href="match_local.html">Match locally</a></td>
+            </tr>
+            <tr>
+                <td><a href="match_online.html">Match online</a></td>
+            </tr>
+            <tr>
+                <td id="logout"><a href="logout.php">Logout</a></td>
+            </tr>
+        </table>
+    </div>
+    <div id="logo">
+        <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
+    </div>
+</body>
+</html>

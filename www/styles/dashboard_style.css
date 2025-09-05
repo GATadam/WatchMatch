@@ -1,0 +1,75 @@
+*{
+    padding: 0;
+}
+
+.header { /* felül írja amit kell */
+    text-align: center;
+    align-items: center;
+}
+
+#logo { /* felül írja amit kell */
+    bottom: 20px;
+    right: 20px;
+    top: auto;
+    left: auto;
+}
+
+#side_menu {
+    position: absolute;
+    top: 50px;
+    left: 20px;
+    background-color: #111827;
+    padding: 0;
+    border-radius: 10px;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 200px;
+    height: auto;
+}
+
+#side_menu table {
+    margin-top: 10px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#side_menu th {
+    text-align: center;
+    width: 100px;
+    height: 100px;
+}
+
+#profile_icon {
+    width: 80px !important;
+    height: auto !important;
+    display: inline-block;
+    border-radius: 50%;
+    border: 2px solid #000;
+    font-family: "ProfileIconFont", Arial, sans-serif;
+    font-weight: normal;
+    font-size: 100px;
+    color: #fff;
+    background-color: #000;
+    line-height: 80px; /* Vertikális középre igazítás */
+    text-align: center; /* Horizontális középre igazítás */
+}
+
+td {
+    text-align: justify;
+    padding: 10px;
+}
+
+#username {
+    text-align: center;
+}
+
+#logout{
+    padding-top: 100px;
+}
+
+#side_menu a {
+    color: #bbb;
+    font-weight: 600;
+    text-decoration: none;
+    padding:3px 10px;
+}

@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT password_hash FROM Users WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT password_hash FROM " . getenv('DB_TABLE_U') . " WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch();
 

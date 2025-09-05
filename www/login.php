@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 $envPath = '/web/htdocs/www.kosmicdoom.com/home/.env';
 if (file_exists($envPath)) {
     $lines = file($envPath);
@@ -26,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT id, username, password_hash, email_verified FROM Users WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT id, username, password_hash, email_verified FROM " . getenv('DB_TABLE_U') . " WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch();
 
@@ -38,6 +41,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         header("Location: dashboard.php");
+        do
+        {
+            $token = bin2hex(random_bytes(32));
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE auth_token = ?");
+            $stmt->execute([$token]);
+        } while ($stmt->fetchColumn() > 0);
+        setcookie('watchmatch_auth_token', $token, time() + 60*60*24*30, '/', '', true, true);
+        $stmt = $pdo->prepare("UPDATE " . getenv('DB_TABLE_U') . " SET auth_token = ? WHERE id = ?");
+        $stmt->execute([$token, $user['id']]);
         exit;
     } else {
         echo "Invalid username or password.";

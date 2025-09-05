@@ -26,12 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Database connection failed, try again later.");
     }
 
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM Users WHERE email = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetchColumn() > 0) {
         die("Email already registered.");
     }
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM Users WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE username = ?");
     $stmt->execute([$username]);
     if ($stmt->fetchColumn() > 0) {
         die("Username already taken.");
@@ -39,11 +39,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // elméletileg ez korábban le lett kezelve, de a hibák elkerülése érdekében itt is megnézzük
     do {
         $token = bin2hex(random_bytes(32));
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM Users WHERE verification_token = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE verification_token = ?");
         $stmt->execute([$token]);
     } while ($stmt->fetchColumn() > 0);
 
-    $stmt = $pdo->prepare("INSERT INTO Users (email, verification_token, email_verified, username, password_hash, region_id, profil_icon, icon_color, icon_bg_color) VALUES (?, ?, 0, ?, ?, ?, 0, '#ffffff', '#000000')");
+    $stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_U') . " (email, verification_token, email_verified, username, password_hash, region_id, profil_icon, icon_color, icon_bg_color) VALUES (?, ?, 0, ?, ?, ?, 'a', 'ffffff', '000000')");
     $stmt->execute([$email, $token, $username, $password, $region]);
 
     $to = $email;

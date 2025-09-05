@@ -30,7 +30,7 @@ try {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM Users WHERE email = ?");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_USERS') . " WHERE email = ?");
 $stmt->execute([$email]);
 $exists = $stmt->fetchColumn() > 0;
 
