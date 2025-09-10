@@ -66,7 +66,7 @@ if (isset($_COOKIE['watchmatch_auth_token'])) {
     <div id="side_menu">
         <table>
             <tr>
-                <th><span id="profile_icon" style="color: #<?php echo $profile_icon_color; ?> !important; background-color: #<?php echo $profile_icon_bg_color; ?> !important;"><?php echo $profile_icon; ?></span></th> <!-- majd php tölti be, csak 1 karakter, angol abc bármelyik betűje lehet -->
+                <th><span id="profile_icon" style="color: #<?php echo $profile_icon_color; ?> !important; background-color: #<?php echo $profile_icon_bg_color; ?> !important;"><?php echo $profile_icon; ?></span></th>
             </tr>
             <tr>
                 <td id="username"><?php echo $username; ?></td>
