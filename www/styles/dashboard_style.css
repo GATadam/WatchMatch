@@ -7,9 +7,14 @@
     align-items: center;
 }
 
+#header_container {
+    position: relative;
+    margin-left: 220px;
+}
+
 #logo { /* felül írja amit kell */
-    bottom: 20px;
-    right: 20px;
+    bottom: 30px;
+    right: 30px;
     top: auto;
     left: auto;
 }
@@ -72,4 +77,60 @@ td {
     font-weight: 600;
     text-decoration: none;
     padding:3px 10px;
+}
+
+#content {
+    position: absolute;
+    top: 150px;
+    left: 240px;
+    right: 20px;
+    bottom: 20px;
+    background-color: #111827;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #000000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.login_field {
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+label {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+input {
+    padding: 0px 10px;
+    border-radius: 10px;
+    border: 1px solid #374151;
+    background-color: #0b1220;
+}
+
+select {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #374151;
+    background: #0b1220;
+    color: #e2e8f0;
+}
+
+#pf_icon {
+    font-family: 'ProfileIconFont';
+    font-size: 150px;
+    padding: 0 50px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url('https://www.kosmicdoom.com/watchmatch_media/drop_down_menu_arrow.svg') no-repeat right 10px center;
+    background-size: 50px;
+    padding-right: 40px;
+    background-color: #0b1220;
+}
+
+.btn {
+    width: 50%;
 }

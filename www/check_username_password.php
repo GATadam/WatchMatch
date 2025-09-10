@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json');
 $envPath = '/web/htdocs/www.kosmicdoom.com/home/.env';
 if (file_exists($envPath)) {
     $lines = file($envPath);

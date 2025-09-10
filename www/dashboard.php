@@ -1,7 +1,4 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 $envPath = '/web/htdocs/www.kosmicdoom.com/home/.env';
 if (file_exists($envPath)) {
     $lines = file($envPath);
@@ -75,22 +72,34 @@ if (isset($_COOKIE['watchmatch_auth_token'])) {
                 <td id="username"><?php echo $username; ?></td>
             </tr>
             <tr>
-                <td><a href="dashboard.html">Profile</a></td>
+                <td><a href="?p=settings">Profile</a></td>
             </tr>
             <tr>
-                <td><a href="profile.html">Friends</a></td>
+                <td><a href="?p=friends">Friends</a></td>
             </tr>
             <tr>
-                <td><a href="match_local.html">Match locally</a></td>
+                <td><a href="?p=match_local">Match locally</a></td>
             </tr>
             <tr>
-                <td><a href="match_online.html">Match online</a></td>
+                <td><a href="?p=match_online">Match online</a></td>
             </tr>
             <tr>
                 <td id="logout"><a href="logout.php">Logout</a></td>
             </tr>
         </table>
     </div>
+
+    <?php
+    $page = $_GET['p'];
+    $allowed_pages = ['settings', 'friends', 'match_local', 'match_online', 'landing_page'];
+    if (in_array($page, $allowed_pages)) {
+        include('dashboard/' . $page . '.php');
+    } else {
+        // TODO
+        //include('dashboard/landing_page.php');
+    }
+    ?>
+
     <div id="logo">
         <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
     </div>
