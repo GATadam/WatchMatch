@@ -21,7 +21,7 @@
             <label for="pf_icon">Choose your icon</label>
             <select name="icon" id="pf_icon">
             <?php
-            $letters = range('a', 'z');
+            $letters = array_merge(range('a', 'z'), range('A', 'Z'), range('0', '9'));
             $startIndex = array_search($profile_icon, $letters);
             if ($startIndex === false) $startIndex = 0;
             for ($i = $startIndex; $i < count($letters); $i++) {

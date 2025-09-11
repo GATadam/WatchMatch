@@ -55,8 +55,8 @@
     font-size: 100px;
     color: #fff;
     background-color: #000;
-    line-height: 80px; /* Vertikális középre igazítás */
-    text-align: center; /* Horizontális középre igazítás */
+    line-height: 80px;
+    text-align: center;
 }
 
 td {
@@ -133,4 +133,33 @@ select {
 
 .btn {
     width: 50%;
+}
+
+.friend_icon {
+    width: 50px !important;
+    height: auto !important;
+    display: inline-block;
+    border-radius: 50%;
+    border: 2px solid #000;
+    font-family: "ProfileIconFont";
+    font-weight: normal;
+    font-size: 50px;
+    color: #fff;
+    background-color: #000;
+    line-height: 50px;
+    text-align: center;
+}
+
+#friends_list {
+    float: left;
+}
+
+#incoming_requests {
+    float: left;
+    margin-left: 150px;
+}
+
+#sent_requests {
+    float: left;
+    margin-left: 150px;
 }

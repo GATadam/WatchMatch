@@ -22,7 +22,7 @@
     <div id="side_menu">
         <table>
             <tr>
-                <th><span id="profile_icon">k</span></th> <!-- majd php tölti be, csak 1 karakter, angol abc bármelyik betűje lehet -->
+                <th><span id="profile_icon">k</span></th> <!-- majd php tölti be, csak 1 karakter, angol abc bármelyik betűje lehet, kis nagy betű, plusz számjegyek -->
             </tr>
             <tr>
                 <td id="username">Username</td>
@@ -91,6 +91,105 @@
             </div>
         </form>
         -->
+        <div id="friends_list">
+            <h2>Friends</h2>
+            <div class="friend_profile">
+                <div class="friend_icon">a</div>
+                <div class="friend_info">
+                    <p class="friend_name">Friend 1</p>
+                </div>
+                <div class="friend_actions">
+                    <button class="action_button">Unfriend</button>
+                    <button class="action_button">Block</button>
+                </div>
+            </div>
+            <div class="friend_profile">
+                <div class="friend_icon">a</div>
+                <div class="friend_info">
+                    <p class="friend_name">Friend 1</p>
+                </div>
+                <div class="friend_actions">
+                    <button class="action_button">Unfriend</button>
+                    <button class="action_button">Block</button>
+                </div>
+            </div>
+        </div>
+        <div id="incoming_requests">
+            <h2>Friend Requests</h2>
+            <div class="friend_profile">
+                <div class="friend_icon">a</div>
+                <div class="friend_info">
+                    <p class="friend_name">Friend 1</p>
+                </div>
+                <div class="friend_actions">
+                    <button class="action_button">Accept</button>
+                    <button class="action_button">Decline</button>
+                    <button class="action_button">Block</button>
+                </div>
+            </div>
+            <div class="friend_profile">
+                <div class="friend_icon">a</div>
+                <div class="friend_info">
+                    <p class="friend_name">Friend 1</p>
+                </div>
+                <div class="friend_actions">
+                    <button class="action_button">Accept</button>
+                    <button class="action_button">Decline</button>
+                    <button class="action_button">Block</button>
+                </div>
+            </div>
+        </div>
+        <div id="sent_requests">
+            <h2>Pending Requests</h2>
+            <div class="friend_profile">
+                <div class="friend_icon">a</div>
+                <div class="friend_info">
+                    <p class="friend_name">Friend 1</p>
+                </div>
+                <div class="friend_actions">
+                    <button class="action_button">Unfriend</button>
+                    <button class="action_button">Block</button>
+                </div>
+            </div>
+            <div class="friend_profile">
+                <div class="friend_icon">a</div>
+                <div class="friend_info">
+                    <p class="friend_name">Friend 1</p>
+                </div>
+                <div class="friend_actions">
+                    <button class="action_button">Unfriend</button>
+                    <button class="action_button">Block</button>
+                </div>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <div id="search_user">
+            <h2>Search User</h2>
+            <input type="text" id="search_input" placeholder="Enter username">
+            <button id="search_button">Search</button>
+            <div id="search_results">
+                <div class="friend_profile">
+                    <div class="friend_icon">a</div>
+                    <div class="friend_info">
+                        <p class="friend_name">Friend 1</p>
+                    </div>
+                    <div class="friend_actions">
+                        <button class="action_button">Add Friend</button>
+                        <button class="action_button">Block</button>
+                    </div>
+                </div>
+                <div class="friend_profile">
+                    <div class="friend_icon">a</div>
+                    <div class="friend_info">
+                        <p class="friend_name">Friend 1</p>
+                    </div>
+                    <div class="friend_actions">
+                        <button class="action_button">Add Friend</button>
+                        <button class="action_button">Block</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div id="logo">
         <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
