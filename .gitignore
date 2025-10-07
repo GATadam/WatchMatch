@@ -18,3 +18,4 @@ images/
 *.docx
 debug.txt
 debug.log
+.idea/
