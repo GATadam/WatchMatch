@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+
 $envPath = '/web/htdocs/www.kosmicdoom.com/home/.env';
 if (file_exists($envPath)) {
     $lines = file($envPath);
@@ -9,6 +10,7 @@ if (file_exists($envPath)) {
         }
     }
 }
+
 if (!isset($_GET['email']) || trim($_GET['email']) === '') {
     echo json_encode(['exists' => false, 'error' => 'No email provided']);
     exit;
@@ -30,7 +32,7 @@ try {
     exit;
 }
 
-$stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_USERS') . " WHERE email = ?");
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE email = ?");
 $stmt->execute([$email]);
 $exists = $stmt->fetchColumn() > 0;
 

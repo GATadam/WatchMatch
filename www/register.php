@@ -1,10 +1,9 @@
 <?php
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
-    $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $region = $_POST['region'];
-    //$token = bin2hex(random_bytes(32));
+    $email = trim($_POST['email'] ?? '');
+    $username = trim($_POST['username'] ?? '');
+    $plainPassword = $_POST['password'] ?? '';
+    $region = $_POST['region'] ?? '';
 
     $envPath = '/web/htdocs/www.kosmicdoom.com/home/.env';
     if (file_exists($envPath)) {
@@ -15,9 +14,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     }
+
     $dsn = 'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_NAME') . ';charset=utf8mb4';
     $user = getenv('DB_USER_NAME');
     $pass = getenv('DB_PASSWORD');
+    $usersTable = getenv('DB_TABLE_U');
+
     try {
         $pdo = new PDO($dsn, $user, $pass, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
@@ -26,29 +28,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Database connection failed, try again later.");
     }
 
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE email = ?");
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        die("Invalid email address.");
+    }
+
+    if ($username === '' || $plainPassword === '' || $region === '') {
+        die("Missing required registration data.");
+    }
+
+    $password = password_hash($plainPassword, PASSWORD_DEFAULT);
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . $usersTable . " WHERE email = ?");
     $stmt->execute([$email]);
     if ($stmt->fetchColumn() > 0) {
         die("Email already registered.");
     }
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE username = ?");
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . $usersTable . " WHERE username = ?");
     $stmt->execute([$username]);
     if ($stmt->fetchColumn() > 0) {
         die("Username already taken.");
     }
-    // elméletileg ez korábban le lett kezelve, de a hibák elkerülése érdekében itt is megnézzük
+
     do {
         $token = bin2hex(random_bytes(32));
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . getenv('DB_TABLE_U') . " WHERE verification_token = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM " . $usersTable . " WHERE verification_token = ?");
         $stmt->execute([$token]);
     } while ($stmt->fetchColumn() > 0);
 
-    $stmt = $pdo->prepare("INSERT INTO " . getenv('DB_TABLE_U') . " (email, verification_token, email_verified, username, password_hash, region_id, profil_icon, icon_color, icon_bg_color) VALUES (?, ?, 0, ?, ?, ?, 'a', 'ffffff', '000000')");
-    $stmt->execute([$email, $token, $username, $password, $region]);
-
     $to = $email;
     $subject = "Please verify your email address";
-    // TODO: szépíteni css-sel, most van placeholder
     $message = '
         <html>
         <head>
@@ -59,25 +68,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div style="max-width: 600px; margin: 50px auto; padding: 20px; background-color: #111827; border-radius: 15px; text-align: justify;">
             <p style="color: #ffffff;">Thank you for creating an account for WatchMatch, we appreciate your support!</p>
             <p style="color: #ffffff;">Please confirm your registration by clicking on the following link:</p>
-            <a style="background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 15px; border-radius: 5px;" href="https://kosmicdoom.com/watchmatch/verify_email.php?token=' . $token . '" >Verify registration</a>
+            <a style="background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 15px; border-radius: 5px;" href="https://kosmicdoom.com/watchmatch/verify_email.php?token=' . $token . '">Verify registration</a>
             <br>
             <img src="https://kosmicdoom.com/watchmatch_media/logo.png" alt="WatchMatch Logo" style="max-width: 200px; height: auto;" />
             </div>
         </body>
         </html>
         ';
-    
+
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-type: text/html; charset=UTF-8\r\n";
-    // ez a két sor kell a html-hez ^
     $headers .= "From: watchmatch@kosmicdoom.com\r\n";
     $headers .= "Reply-To: watchmatch@kosmicdoom.com\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
 
-    if(mail($to, $subject, $message, $headers)) {
+    try {
+        $pdo->beginTransaction();
+
+        $stmt = $pdo->prepare("INSERT INTO " . $usersTable . " (email, verification_token, email_verified, username, password_hash, region_id, profil_icon, icon_color, icon_bg_color) VALUES (?, ?, 0, ?, ?, ?, 'a', 'ffffff', '000000')");
+        $stmt->execute([$email, $token, $username, $password, $region]);
+
+        if (!mail($to, $subject, $message, $headers)) {
+            $pdo->rollBack();
+            echo "Error occurred while sending email.";
+            exit;
+        }
+
+        $pdo->commit();
         echo "Successfully created an account! Please verify your email.";
-    } else {
-        echo "Error occurred while sending email.";
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        echo "Registration failed. Please try again later.";
     }
 }
 ?>

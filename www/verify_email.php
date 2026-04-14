@@ -12,6 +12,7 @@ if (file_exists($envPath)) {
 $dsn = 'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_NAME') . ';charset=utf8mb4';
 $user = getenv('DB_USER_NAME');
 $pass = getenv('DB_PASSWORD');
+$usersTable = getenv('DB_TABLE_U');
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [
@@ -29,7 +30,7 @@ if (!isset($_GET['token']) || trim($_GET['token']) === '') {
 
 $token = trim($_GET['token']);
 
-$stmt = $pdo->prepare("SELECT id, email_verified FROM Users WHERE verification_token = ?");
+$stmt = $pdo->prepare("SELECT id, email_verified FROM " . $usersTable . " WHERE verification_token = ?");
 $stmt->execute([$token]);
 $user = $stmt->fetch();
 
@@ -43,7 +44,7 @@ if ($user['email_verified']) {
     exit;
 }
 
-$stmt = $pdo->prepare("UPDATE Users SET email_verified = 1, verification_token = NULL WHERE id = ?");
+$stmt = $pdo->prepare("UPDATE " . $usersTable . " SET email_verified = 1, verification_token = NULL WHERE id = ?");
 $stmt->execute([$user['id']]);
 
 echo "Your email has been successfully verified. You can now log in.";

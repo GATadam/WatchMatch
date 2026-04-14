@@ -95,9 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         const data = await response.json();
 
-        if (data.valid) {
-            window.location.href = 'index.php';
-        } else {
+        if (!data.valid) {
             alert('Invalid username or password.');
             return;
         }
