@@ -70,8 +70,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $headers = "MIME-Version: 1.0\r\n";
     $headers .= "Content-type: text/html; charset=UTF-8\r\n";
     // ez a két sor kell a html-hez ^
-    $headers .= "From: noreply@watchmatch.com\r\n";
-    $headers .= "Reply-To: noreply@watchmatch.com\r\n";
+    $headers .= "From: watchmatch@kosmicdoom.com\r\n";
+    $headers .= "Reply-To: watchmatch@kosmicdoom.com\r\n";
     $headers .= "X-Mailer: PHP/" . phpversion();
 
     if(mail($to, $subject, $message, $headers)) {
