@@ -38,8 +38,8 @@ try {
             }
 
             $stmt = $pdo->prepare("
-                INSERT INTO {$friendsTable} (user_id_1, user_id_2)
-                VALUES (?, ?)
+                INSERT INTO {$friendsTable} (user_id_1, user_id_2, num_of_movies_watched)
+                VALUES (?, ?, 0)
             ");
             $stmt->execute([$currentUserId, $targetUserId]);
 
@@ -75,8 +75,8 @@ try {
 
             if (!$acceptedAlready) {
                 $stmt = $pdo->prepare("
-                    INSERT INTO {$friendsTable} (user_id_1, user_id_2)
-                    VALUES (?, ?)
+                    INSERT INTO {$friendsTable} (user_id_1, user_id_2, num_of_movies_watched)
+                    VALUES (?, ?, 0)
                 ");
                 $stmt->execute([$currentUserId, $targetUserId]);
             }

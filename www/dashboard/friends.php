@@ -44,8 +44,13 @@ function h($value)
 
 <script>
 (() => {
-    const apiBaseUrl = <?php echo json_encode($apiBaseUrl, JSON_UNESCAPED_SLASHES); ?>;
+    const requestedApiBaseUrl = <?php echo json_encode($apiBaseUrl, JSON_UNESCAPED_SLASHES); ?>;
     const initialSearchQuery = <?php echo json_encode($searchQuery, JSON_UNESCAPED_UNICODE); ?>;
+    const apiBaseUrlCandidates = Array.from(new Set([
+        requestedApiBaseUrl,
+        window.location.origin + '/watchmatch_api',
+        'https://www.kosmicdoom.com/watchmatch_api'
+    ]));
 
     const feedbackNode = document.getElementById('friends_feedback');
     const friendsBody = document.querySelector('#friends_list .friends_panel_body');
@@ -62,6 +67,7 @@ function h($value)
         searchResults: [],
         searchQuery: initialSearchQuery || ''
     };
+    let workingApiBaseUrl = null;
 
     function escapeHtml(value) {
         return String(value)
@@ -85,13 +91,13 @@ function h($value)
         feedbackNode.className = 'friends_feedback ' + type;
     }
 
-    async function apiFetch(endpoint, options = {}) {
+    async function requestApi(baseUrl, endpoint, options = {}) {
         const method = (options.method || 'GET').toUpperCase();
         const params = options.params || {};
-        let url = apiBaseUrl + '/' + endpoint;
+        let url = baseUrl + '/' + endpoint;
         const fetchOptions = {
             method,
-            credentials: 'same-origin',
+            credentials: 'include',
             headers: {
                 'Accept': 'application/json'
             }
@@ -107,7 +113,15 @@ function h($value)
             fetchOptions.body = new URLSearchParams(params).toString();
         }
 
-        const response = await fetch(url, fetchOptions);
+        let response;
+        try {
+            response = await fetch(url, fetchOptions);
+        } catch (error) {
+            const networkError = new Error(error && error.message ? error.message : 'Failed to fetch');
+            networkError.isRetryable = true;
+            throw networkError;
+        }
+
         const rawText = await response.text();
         const normalizedText = rawText.replace(/^\uFEFF/, '').trim();
 
@@ -116,7 +130,9 @@ function h($value)
             payload = JSON.parse(normalizedText);
         } catch (error) {
             const preview = normalizedText.slice(0, 200);
-            throw new Error(preview ? 'Invalid API response: ' + preview : 'Invalid API response.');
+            const invalidResponseError = new Error(preview ? 'Invalid API response: ' + preview : 'Invalid API response.');
+            invalidResponseError.isRetryable = true;
+            throw invalidResponseError;
         }
 
         if (!response.ok || !payload.success) {
@@ -124,6 +140,27 @@ function h($value)
         }
 
         return payload;
+    }
+
+    async function apiFetch(endpoint, options = {}) {
+        const candidates = workingApiBaseUrl ? [workingApiBaseUrl] : apiBaseUrlCandidates;
+        let lastError = null;
+
+        for (const baseUrl of candidates) {
+            try {
+                const payload = await requestApi(baseUrl, endpoint, options);
+                workingApiBaseUrl = baseUrl;
+                return payload;
+            } catch (error) {
+                lastError = error;
+
+                if (!error.isRetryable && error.message !== 'Failed to fetch') {
+                    throw error;
+                }
+            }
+        }
+
+        throw lastError || new Error('Failed to fetch');
     }
 
     function emptyStateHtml(message) {
