@@ -19,3 +19,4 @@ images/
 debug.txt
 debug.log
 .idea/
+*.sql
