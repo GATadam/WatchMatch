@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const eyeIcons = document.querySelectorAll('.eye-icon');
     const registerForm = document.querySelector('#register form');
     const loginForm = document.querySelector('#login form');
+    const forgotPasswordToggle = document.getElementById('forgot_password_toggle');
+    const forgotPasswordPanel = document.getElementById('forgot_password_panel');
+    const forgotPasswordForm = document.getElementById('forgot_password_form');
+    const forgotPasswordUsername = document.getElementById('forgot_password_username');
+    const forgotPasswordFeedback = document.getElementById('forgot_password_feedback');
+    const loginUsernameInput = document.getElementById('username_login');
+    const apiBaseUrlCandidates = Array.from(new Set([
+        'https://kosmicdoom.com/watchmatch_api',
+        window.location.origin + '/watchmatch_api',
+        'https://www.kosmicdoom.com/watchmatch_api'
+    ]));
 
     function activateTab(view) {
         const showLogin = view === 'login';
@@ -14,6 +25,53 @@ document.addEventListener('DOMContentLoaded', () => {
         tabRegister.classList.toggle('active', !showLogin);
         loginPanel.classList.toggle('active', showLogin);
         registerPanel.classList.toggle('active', !showLogin);
+
+        if (!showLogin && forgotPasswordPanel) {
+            forgotPasswordPanel.hidden = true;
+        }
+    }
+
+    function setForgotPasswordFeedback(message, type = 'info') {
+        if (!forgotPasswordFeedback) {
+            return;
+        }
+
+        if (!message) {
+            forgotPasswordFeedback.hidden = true;
+            forgotPasswordFeedback.textContent = '';
+            forgotPasswordFeedback.className = 'auth_inline_feedback';
+            return;
+        }
+
+        forgotPasswordFeedback.hidden = false;
+        forgotPasswordFeedback.textContent = message;
+        forgotPasswordFeedback.className = 'auth_inline_feedback is-' + type;
+    }
+
+    async function requestResetApi(endpoint, params) {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: new URLSearchParams(params).toString()
+        });
+
+        const text = await response.text();
+        let payload;
+        try {
+            payload = JSON.parse(text);
+        } catch (error) {
+            throw new Error('Invalid API response.');
+        }
+
+        if (!response.ok || !payload.success) {
+            throw new Error(payload.message || 'Could not start password reset.');
+        }
+
+        return payload;
     }
 
     async function loadRegions() {
@@ -41,6 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tabLogin.addEventListener('click', () => activateTab('login'));
     tabRegister.addEventListener('click', () => activateTab('register'));
+
+    if (forgotPasswordToggle && forgotPasswordPanel) {
+        forgotPasswordToggle.addEventListener('click', () => {
+            const shouldShow = forgotPasswordPanel.hidden;
+            forgotPasswordPanel.hidden = !shouldShow;
+
+            if (shouldShow && forgotPasswordUsername && loginUsernameInput) {
+                forgotPasswordUsername.value = loginUsernameInput.value.trim();
+                forgotPasswordUsername.focus();
+            }
+        });
+    }
 
     eyeIcons.forEach((icon) => {
         icon.addEventListener('click', () => {
@@ -106,6 +176,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 loginForm.submit();
             } catch (error) {
                 alert('Could not verify your login right now.');
+            }
+        });
+    }
+
+    if (forgotPasswordForm && forgotPasswordUsername) {
+        forgotPasswordForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const username = forgotPasswordUsername.value.trim() || (loginUsernameInput ? loginUsernameInput.value.trim() : '');
+            if (!username) {
+                setForgotPasswordFeedback('Please enter your username first.', 'error');
+                return;
+            }
+
+            try {
+                setForgotPasswordFeedback('Sending reset link...', 'info');
+
+                let result = null;
+                let lastError = null;
+                for (const baseUrl of apiBaseUrlCandidates) {
+                    try {
+                        result = await requestResetApi(baseUrl + '/request_password_reset.php', { username });
+                        break;
+                    } catch (error) {
+                        lastError = error;
+                    }
+                }
+
+                if (!result) {
+                    throw lastError || new Error('Could not start password reset.');
+                }
+
+                setForgotPasswordFeedback(result.message || 'Password reset email sent.', 'success');
+            } catch (error) {
+                setForgotPasswordFeedback(error.message || 'Could not start password reset.', 'error');
             }
         });
     }

@@ -38,49 +38,14 @@ body.dashboard_menu_open {
     min-height: 100dvh;
 }
 
-.dashboard_topbar {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 16px 24px;
-    background: rgba(5, 11, 20, 0.78);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.dashboard_topbar_brand {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--dashboard-text);
-    text-decoration: none;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-}
-
-.dashboard_topbar_brand img,
-.dashboard_brand_mark img,
-.dashboard_logo_badge img {
+.dashboard_brand_mark img {
     display: block;
     width: 100%;
     height: auto;
 }
 
-.dashboard_topbar_brand img {
-    width: 42px;
-}
-
-.dashboard_topbar_title {
-    margin: 0;
-    color: var(--dashboard-muted);
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+.dashboard_mobile_topbar {
+    display: none;
 }
 
 .dashboard_menu_toggle {
@@ -113,6 +78,22 @@ body.dashboard_menu_open {
     backdrop-filter: blur(6px);
 }
 
+.dashboard_mobile_brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--dashboard-text);
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+}
+
+.dashboard_mobile_brand img {
+    width: 38px;
+    height: auto;
+    display: block;
+}
+
 .dashboard_layout {
     display: grid;
     grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
@@ -128,11 +109,11 @@ body.dashboard_menu_open {
 
 .dashboard_sidebar_inner {
     position: sticky;
-    top: 96px;
+    top: 24px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    min-height: calc(100dvh - 120px);
+    min-height: calc(100dvh - 48px);
     padding: 24px;
     border: 1px solid var(--dashboard-border);
     border-radius: var(--dashboard-radius);
@@ -141,6 +122,13 @@ body.dashboard_menu_open {
 }
 
 .dashboard_brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.dashboard_brand_link {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -168,6 +156,29 @@ body.dashboard_menu_open {
     margin: 0;
     font-size: 28px;
     line-height: 1;
+}
+
+.dashboard_sidebar_close {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    border: 1px solid rgba(42, 198, 217, 0.18);
+    border-radius: 18px;
+    background: rgba(17, 24, 39, 0.92);
+    cursor: pointer;
+}
+
+.dashboard_sidebar_close span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    margin: 0 auto;
+    border-radius: 999px;
+    background: var(--dashboard-text);
 }
 
 .dashboard_user_card {
@@ -239,12 +250,7 @@ body.dashboard_menu_open {
 .dashboard_sidebar_footer {
     margin-top: auto;
     display: grid;
-    gap: 16px;
-}
-
-.dashboard_logo_badge {
-    width: 92px;
-    opacity: 0.72;
+    gap: 12px;
 }
 
 .dashboard_main {
@@ -253,7 +259,7 @@ body.dashboard_menu_open {
 
 #content {
     position: relative;
-    min-height: calc(100dvh - 144px);
+    min-height: calc(100dvh - 48px);
     padding: clamp(20px, 2vw, 32px);
     border-radius: var(--dashboard-radius);
     border: 1px solid var(--dashboard-border);
@@ -277,7 +283,7 @@ body.dashboard_menu_open {
 .page_intro h2,
 .home_hero h2 {
     margin: 0 0 10px;
-    font-size: clamp(28px, 4vw, 42px);
+    font-size: clamp(24px, 3.4vw, 36px);
 }
 
 .home_kicker,
@@ -436,7 +442,7 @@ input[type="color"] {
 .home_summary_card h3,
 .home_action_card h3 {
     margin: 0 0 10px;
-    font-size: 22px;
+    font-size: clamp(18px, 1.8vw, 21px);
 }
 
 .home_action_card:hover,
@@ -483,7 +489,7 @@ input[type="color"] {
 
 .settings_preview_card h3 {
     margin: 0;
-    font-size: 22px;
+    font-size: clamp(18px, 1.8vw, 21px);
 }
 
 .settings_preview_icon {
@@ -571,7 +577,7 @@ input[type="color"] {
 
 .friends_panel h2 {
     margin: 0 0 14px;
-    font-size: 22px;
+    font-size: clamp(18px, 1.8vw, 21px);
 }
 
 .friend_profile {
@@ -594,6 +600,22 @@ input[type="color"] {
 .friend_name {
     margin: 0;
     color: var(--dashboard-text);
+    font-weight: 700;
+}
+
+.friend_name_row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.friend_streak {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #f8b84f;
+    font-size: 14px;
     font-weight: 700;
 }
 
@@ -658,7 +680,7 @@ input[type="color"] {
 }
 
 .match_online_choice_title {
-    font-size: 22px;
+    font-size: clamp(18px, 1.8vw, 21px);
     font-weight: 800;
 }
 
@@ -688,6 +710,7 @@ input[type="color"] {
 .match_room_header h3 {
     margin: 0 0 6px;
     color: var(--dashboard-text);
+    font-size: clamp(18px, 1.8vw, 21px);
 }
 
 .match_online_provider_tools,
@@ -730,6 +753,7 @@ input[type="color"] {
     width: 32px;
     height: 32px;
     object-fit: contain;
+    border-radius: 10px;
     background: transparent;
     padding: 0;
 }
@@ -893,7 +917,7 @@ input[type="color"] {
 .match_online_card_content h3 {
     margin: 6px 0 0;
     color: #ffffff;
-    font-size: clamp(28px, 4vw, 38px);
+    font-size: clamp(22px, 3.1vw, 32px);
     line-height: 1.08;
 }
 
@@ -926,12 +950,13 @@ input[type="color"] {
     backdrop-filter: blur(10px);
     border-radius: inherit;
     z-index: 20;
+    overflow-y: auto;
 }
 
 .match_online_match_modal {
     width: min(540px, 100%);
-    max-height: 100%;
-    overflow: auto;
+    max-height: none;
+    overflow: visible;
     padding: 24px;
     border-radius: 24px;
     background: linear-gradient(145deg, #0f172a, #111827);
@@ -941,7 +966,7 @@ input[type="color"] {
 
 .match_online_match_modal h3 {
     margin: 0 0 14px;
-    font-size: clamp(28px, 4vw, 36px);
+    font-size: clamp(22px, 3vw, 30px);
 }
 
 .match_online_match_poster {
@@ -1015,16 +1040,23 @@ input[type="color"] {
 }
 
 @media (max-width: 960px) {
+    .dashboard_mobile_topbar {
+        position: sticky;
+        top: 0;
+        z-index: 45;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        min-height: 78px;
+        padding: 14px 16px;
+        background: rgba(5, 11, 20, 0.86);
+        backdrop-filter: blur(18px);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    }
+
     .dashboard_menu_toggle {
         display: inline-flex;
-    }
-
-    .dashboard_topbar {
-        padding: 14px 16px;
-    }
-
-    .dashboard_topbar_title {
-        display: none;
+        flex: 0 0 auto;
     }
 
     .dashboard_layout {
@@ -1032,11 +1064,15 @@ input[type="color"] {
         padding: 16px;
     }
 
+    .dashboard_backdrop {
+        z-index: 55;
+    }
+
     .dashboard_sidebar {
         position: fixed;
         inset: 0 auto 0 0;
         width: min(88vw, 320px);
-        z-index: 40;
+        z-index: 60;
         transform: translateX(-104%);
         transition: transform 0.24s ease;
         pointer-events: none;
@@ -1051,6 +1087,18 @@ input[type="color"] {
         top: 0;
         min-height: 100dvh;
         border-radius: 0 24px 24px 0;
+        padding-top: 24px;
+        background: #0b1220;
+        backdrop-filter: none;
+    }
+
+    .dashboard_brand_mark {
+        display: none;
+    }
+
+    .dashboard_sidebar_close {
+        display: inline-flex;
+        flex: 0 0 auto;
     }
 
     .dashboard_main {
@@ -1080,10 +1128,6 @@ input[type="color"] {
 }
 
 @media (max-width: 700px) {
-    .dashboard_topbar_brand span {
-        display: none;
-    }
-
     .dashboard_user_card,
     .friend_profile,
     .match_online_join_card,

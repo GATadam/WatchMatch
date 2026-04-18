@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare('UPDATE ' . getenv('DB_TABLE_U') . ' SET auth_token = ? WHERE id = ?');
         $stmt->execute([$token, $user['id']]);
 
-        header('Location: dashboard.php');
+        header('Location: dashboard.php?login_cleanup=1');
         exit;
     }
 

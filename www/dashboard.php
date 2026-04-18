@@ -49,19 +49,13 @@ $username = htmlspecialchars($userData['username'], ENT_QUOTES, 'UTF-8');
 $profile_icon = htmlspecialchars($userData['profil_icon'], ENT_QUOTES, 'UTF-8');
 $profile_icon_color = htmlspecialchars($userData['icon_color'], ENT_QUOTES, 'UTF-8');
 $profile_icon_bg_color = htmlspecialchars($userData['icon_bg_color'], ENT_QUOTES, 'UTF-8');
+$shouldRunLoginCleanup = isset($_GET['login_cleanup']);
 
 $allowedPages = ['landing_page', 'settings', 'friends', 'match_online'];
 $page = $_GET['p'] ?? 'landing_page';
 if (!in_array($page, $allowedPages, true)) {
     $page = 'landing_page';
 }
-
-$pageTitles = [
-    'landing_page' => 'Home',
-    'settings' => 'Profile',
-    'friends' => 'Friends',
-    'match_online' => 'Match Online',
-];
 
 $navigationItems = [
     'landing_page' => 'Home',
@@ -86,7 +80,7 @@ $navigationItems = [
 </head>
 <body class="dashboard_body">
     <div class="dashboard_shell">
-        <header class="dashboard_topbar">
+        <header class="dashboard_mobile_topbar" aria-label="Mobile navigation bar">
             <button
                 type="button"
                 id="dashboard_menu_toggle"
@@ -100,12 +94,10 @@ $navigationItems = [
                 <span></span>
             </button>
 
-            <a class="dashboard_topbar_brand" href="?p=landing_page">
+            <a class="dashboard_mobile_brand" href="?p=landing_page">
                 <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
-                <span>WATCHMATCH</span>
+                <span>WatchMatch</span>
             </a>
-
-            <p class="dashboard_topbar_title"><?php echo htmlspecialchars($pageTitles[$page], ENT_QUOTES, 'UTF-8'); ?></p>
         </header>
 
         <div id="dashboard_backdrop" class="dashboard_backdrop" hidden></div>
@@ -113,15 +105,28 @@ $navigationItems = [
         <div class="dashboard_layout">
             <aside id="dashboard_sidebar" class="dashboard_sidebar" aria-label="Dashboard navigation">
                 <div class="dashboard_sidebar_inner">
-                    <a class="dashboard_brand" href="?p=landing_page">
-                        <div class="dashboard_brand_mark">
-                            <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
-                        </div>
-                        <div>
-                            <p class="dashboard_brand_label">Watchmatch</p>
-                            <h1>Dashboard</h1>
-                        </div>
-                    </a>
+                    <div class="dashboard_brand">
+                        <a class="dashboard_brand_link" href="?p=landing_page">
+                            <div class="dashboard_brand_mark">
+                                <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
+                            </div>
+                            <div>
+                                <p class="dashboard_brand_label">Watchmatch</p>
+                                <h1>Dashboard</h1>
+                            </div>
+                        </a>
+
+                        <button
+                            type="button"
+                            id="dashboard_sidebar_close"
+                            class="dashboard_sidebar_close"
+                            aria-label="Close navigation"
+                        >
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </button>
+                    </div>
 
                     <div class="dashboard_user_card">
                         <span id="profile_icon" style="color: #<?php echo $profile_icon_color; ?>; background-color: #<?php echo $profile_icon_bg_color; ?>;"><?php echo $profile_icon; ?></span>
@@ -141,9 +146,6 @@ $navigationItems = [
 
                     <div class="dashboard_sidebar_footer">
                         <a class="dashboard_logout" href="logout.php">Logout</a>
-                        <div class="dashboard_logo_badge">
-                            <img src="https://www.kosmicdoom.com/watchmatch_media/logo.png" alt="Watchmatch">
-                        </div>
                     </div>
                 </div>
             </aside>
@@ -157,13 +159,49 @@ $navigationItems = [
     <script>
     (() => {
         const menuToggle = document.getElementById('dashboard_menu_toggle');
+        const sidebarClose = document.getElementById('dashboard_sidebar_close');
         const sidebar = document.getElementById('dashboard_sidebar');
         const backdrop = document.getElementById('dashboard_backdrop');
         const navLinks = Array.from(document.querySelectorAll('.dashboard_nav a'));
         const mobileBreakpoint = 960;
+        const shouldRunLoginCleanup = <?php echo $shouldRunLoginCleanup ? 'true' : 'false'; ?>;
+        const cleanupApiCandidates = Array.from(new Set([
+            'https://kosmicdoom.com/watchmatch_api/db_cleaning.php',
+            window.location.origin + '/watchmatch_api/db_cleaning.php',
+            'https://www.kosmicdoom.com/watchmatch_api/db_cleaning.php'
+        ]));
 
         function isMobileLayout() {
             return window.innerWidth <= mobileBreakpoint;
+        }
+
+        async function runLoginCleanup() {
+            if (!shouldRunLoginCleanup) {
+                return;
+            }
+
+            const cleanedUrl = new URL(window.location.href);
+            cleanedUrl.searchParams.delete('login_cleanup');
+            window.history.replaceState({}, '', cleanedUrl.pathname + cleanedUrl.search + cleanedUrl.hash);
+
+            for (const endpoint of cleanupApiCandidates) {
+                try {
+                    const response = await window.fetch(endpoint, {
+                        method: 'POST',
+                        credentials: 'include',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const payload = await response.json();
+                    if (response.ok && payload && payload.success) {
+                        return;
+                    }
+                } catch (error) {
+                    continue;
+                }
+            }
         }
 
         function openMenu() {
@@ -174,6 +212,7 @@ $navigationItems = [
             sidebar.classList.add('is-open');
             backdrop.hidden = false;
             menuToggle.setAttribute('aria-expanded', 'true');
+            menuToggle.setAttribute('aria-label', 'Close navigation');
             document.body.classList.add('dashboard_menu_open');
         }
 
@@ -181,6 +220,7 @@ $navigationItems = [
             sidebar.classList.remove('is-open');
             backdrop.hidden = true;
             menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Open navigation');
             document.body.classList.remove('dashboard_menu_open');
         }
 
@@ -191,6 +231,10 @@ $navigationItems = [
                 openMenu();
             }
         });
+
+        if (sidebarClose) {
+            sidebarClose.addEventListener('click', closeMenu);
+        }
 
         backdrop.addEventListener('click', closeMenu);
 
@@ -213,6 +257,8 @@ $navigationItems = [
                 closeMenu();
             }
         });
+
+        runLoginCleanup();
     })();
     </script>
 </body>

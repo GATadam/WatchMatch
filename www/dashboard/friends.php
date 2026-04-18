@@ -168,13 +168,21 @@ function h($value)
     }
 
     function friendCardHtml(user, actionsHtml) {
+        const sharedWatchedCount = Number(user && user.shared_watched_count ? user.shared_watched_count : 0);
+        const friendMetaHtml = Number.isFinite(sharedWatchedCount)
+            ? `<span class="friend_streak">🔥 ${sharedWatchedCount}</span>`
+            : '';
+
         return `
             <div class="friend_profile">
                 <div class="friend_icon" style="color: #${escapeHtml(user.icon_color)}; background-color: #${escapeHtml(user.icon_bg_color)};">
                     ${escapeHtml(user.profil_icon)}
                 </div>
                 <div class="friend_info">
-                    <p class="friend_name">${escapeHtml(user.username)}</p>
+                    <div class="friend_name_row">
+                        <p class="friend_name">${escapeHtml(user.username)}</p>
+                        ${friendMetaHtml}
+                    </div>
                 </div>
                 <div class="friend_actions">
                     ${actionsHtml}

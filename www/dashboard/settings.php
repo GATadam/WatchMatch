@@ -72,7 +72,6 @@ foreach ($regions as $region) {
                         <p class="home_card_label">Icon picker</p>
                         <h3>Choose your icon</h3>
                     </div>
-                    <p class="match_online_helper">Pick from the full icon font without using a dropdown.</p>
                 </div>
 
                 <input type="hidden" name="icon" id="selected_icon" value="<?php echo $profile_icon; ?>">

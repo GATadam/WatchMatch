@@ -80,6 +80,26 @@ if (isset($_COOKIE['watchmatch_auth_token'])) {
 
                     <button type="submit" class="btn">Login</button>
                 </form>
+
+                <div class="auth_aux_row">
+                    <button type="button" id="forgot_password_toggle" class="auth_text_link_button">Forgot password?</button>
+                </div>
+
+                <div id="forgot_password_panel" class="forgot_password_panel" hidden>
+                    <p class="forgot_password_title">Reset your password by username</p>
+                    <p class="hint">We will send a secure reset link to the email address connected to the username you enter here.</p>
+
+                    <form id="forgot_password_form" class="forgot_password_form">
+                        <div class="login_field">
+                            <label for="forgot_password_username">Username</label>
+                            <input id="forgot_password_username" name="forgot_username" type="text" autocomplete="username" required>
+                        </div>
+
+                        <button type="submit" class="btn btn_secondary_shell">Send reset link</button>
+                    </form>
+
+                    <div id="forgot_password_feedback" class="auth_inline_feedback" hidden></div>
+                </div>
             </div>
 
             <div id="register" class="panel">

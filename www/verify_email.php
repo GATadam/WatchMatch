@@ -1,51 +1,74 @@
 <?php
-$envPath = '/web/htdocs/www.kosmicdoom.com/home/.env';
-if (file_exists($envPath)) {
-    $lines = file($envPath);
-    foreach ($lines as $line) {
-        if (trim($line) && strpos($line, '=') !== false) {
-            putenv(trim($line));
-        }
-    }
+require __DIR__ . '/includes/app_bootstrap.php';
+require __DIR__ . '/includes/auth_feedback.php';
+
+function renderVerifyPage(string $title, string $message, string $tone = 'info', int $statusCode = 200, string $detail = ''): void
+{
+    watchmatchRenderAuthFeedbackPage([
+        'tone' => $tone,
+        'eyebrow' => $tone === 'success' ? 'Email verified' : 'Verification update',
+        'title' => $title,
+        'message' => $message,
+        'detail' => $detail,
+        'status_code' => $statusCode,
+        'actions' => [
+            ['label' => 'Go to login', 'href' => 'login.php'],
+            ['label' => 'Back to home', 'href' => 'index.php', 'variant' => 'secondary'],
+        ],
+    ]);
 }
 
-$dsn = 'mysql:host=' . getenv('DB_HOST') . ';dbname=' . getenv('DB_NAME') . ';charset=utf8mb4';
-$user = getenv('DB_USER_NAME');
-$pass = getenv('DB_PASSWORD');
-$usersTable = getenv('DB_TABLE_U');
+watchmatchLoadEnv();
+$usersTable = getenv('DB_TABLE_U') ?: 'Users';
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
-} catch (PDOException $e) {
-    die("Database connection error.");
+    $pdo = watchmatchCreatePdo();
+} catch (Throwable $throwable) {
+    renderVerifyPage(
+        'Database connection failed',
+        'Watchmatch could not verify your email right now.',
+        'error',
+        500,
+        'Please try the link again later.'
+    );
 }
 
-if (!isset($_GET['token']) || trim($_GET['token']) === '') {
-    echo "Invalid verification link.";
-    exit;
+$token = trim((string) ($_GET['token'] ?? ''));
+if ($token === '') {
+    renderVerifyPage('Invalid verification link', 'The verification link is missing or incomplete.', 'error', 400);
 }
 
-$token = trim($_GET['token']);
-
-$stmt = $pdo->prepare("SELECT id, email_verified FROM " . $usersTable . " WHERE verification_token = ?");
+$stmt = $pdo->prepare("SELECT id, email_verified FROM {$usersTable} WHERE verification_token = ?");
 $stmt->execute([$token]);
 $user = $stmt->fetch();
 
 if (!$user) {
-    echo "Invalid or expired verification link.";
-    exit;
+    renderVerifyPage(
+        'Invalid or expired link',
+        'This verification link is no longer valid.',
+        'error',
+        404,
+        'If needed, create a new account or request a fresh verification email later.'
+    );
 }
 
-if ($user['email_verified']) {
-    echo "Your email is already verified.";
-    exit;
+if ((int) $user['email_verified'] === 1) {
+    renderVerifyPage(
+        'Email already verified',
+        'This Watchmatch account has already been verified.',
+        'info',
+        200,
+        'You can go straight to the login page.'
+    );
 }
 
-$stmt = $pdo->prepare("UPDATE " . $usersTable . " SET email_verified = 1, verification_token = NULL WHERE id = ?");
-$stmt->execute([$user['id']]);
+$stmt = $pdo->prepare("UPDATE {$usersTable} SET email_verified = 1, verification_token = NULL WHERE id = ?");
+$stmt->execute([(int) $user['id']]);
 
-echo "Your email has been successfully verified. You can now log in.";
-?>
+renderVerifyPage(
+    'Email verified successfully',
+    'Your email has been confirmed and your account is ready.',
+    'success',
+    200,
+    'You can now sign in and start planning what to watch together.'
+);
