@@ -25,7 +25,10 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
                     <h3>Resume current room</h3>
                     <p id="match_online_resume_text" class="match_online_helper"></p>
                 </div>
-                <button type="button" class="action_button" id="match_online_resume_room_btn">Resume room</button>
+                <div class="match_online_resume_actions">
+                    <button type="button" class="action_button" id="match_online_resume_room_btn">Resume room</button>
+                    <button type="button" class="action_button secondary_action" id="match_online_delete_resume_btn">Delete room</button>
+                </div>
             </div>
             <div id="match_online_resume_meta" class="match_online_room_meta match_online_resume_meta"></div>
         </div>
@@ -69,7 +72,10 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
                 <p class="match_online_helper">Current room</p>
                 <h3 id="match_online_room_title">Room</h3>
             </div>
-            <span id="match_online_room_status" class="status_badge"></span>
+            <div class="match_room_header_actions">
+                <span id="match_online_room_status" class="status_badge"></span>
+                <button type="button" class="action_button secondary_action match_online_close_room_btn" id="match_online_close_room_btn">Close room</button>
+            </div>
         </div>
 
         <div id="match_online_room_meta" class="match_online_room_meta"></div>
@@ -84,8 +90,8 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
             <div class="match_swipe_board">
                 <div class="match_card_stack" id="match_online_card_stack"></div>
                 <div class="match_swipe_controls">
-                    <button type="button" class="secondary_action action_button match_swipe_btn" data-swipe-direction="left">Swipe left</button>
-                    <button type="button" class="action_button match_swipe_btn" data-swipe-direction="right">Swipe right</button>
+                    <button type="button" class="match_swipe_btn match_swipe_btn--dislike" data-swipe-direction="left" aria-label="Dislike">&#x2715;</button>
+                    <button type="button" class="match_swipe_btn match_swipe_btn--like" data-swipe-direction="right" aria-label="Like">&#x2764;</button>
                 </div>
             </div>
         </div>
@@ -98,6 +104,7 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
             <div id="match_online_match_poster" class="match_online_match_poster"></div>
             <div id="match_online_match_providers" class="match_online_provider_row match_online_match_providers"></div>
             <p id="match_online_match_status" class="match_online_helper"></p>
+            <p id="match_online_decision_waiting" class="match_online_decision_waiting" hidden>Waiting for your partner's response...</p>
             <div class="match_online_match_actions">
                 <button type="button" class="secondary_action action_button" data-match-decision="keep_swiping">Keep swiping</button>
                 <button type="button" class="action_button" data-match-decision="lets_watch">Let's watch</button>
@@ -124,6 +131,7 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
         resumeText: document.getElementById('match_online_resume_text'),
         resumeMeta: document.getElementById('match_online_resume_meta'),
         resumeRoomBtn: document.getElementById('match_online_resume_room_btn'),
+        deleteResumeBtn: document.getElementById('match_online_delete_resume_btn'),
         createPanel: document.getElementById('match_online_create_panel'),
         joinPanel: document.getElementById('match_online_join_panel'),
         providerList: document.getElementById('match_online_provider_list'),
@@ -147,6 +155,8 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
         overlayPoster: document.getElementById('match_online_match_poster'),
         overlayProviders: document.getElementById('match_online_match_providers'),
         overlayStatus: document.getElementById('match_online_match_status'),
+        decisionWaiting: document.getElementById('match_online_decision_waiting'),
+        closeRoomBtn: document.getElementById('match_online_close_room_btn'),
         viewButtons: Array.from(document.querySelectorAll('[data-match-view]')),
         swipeButtons: Array.from(document.querySelectorAll('[data-swipe-direction]')),
         decisionButtons: Array.from(document.querySelectorAll('[data-match-decision]'))
@@ -359,7 +369,6 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
             <article class="match_online_card ${index === 0 ? 'is-top' : ''}" data-movie-id="${Number(movie.id)}" data-base-transform="${escapeHtml(baseTransform)}" style="transform: ${escapeHtml(baseTransform)}; z-index: ${20 - index};">
                 <div class="match_online_card_visual" style="background-image: url('${escapeHtml(pictureUrl)}');"></div>
                 <div class="match_online_card_content">
-                    <p class="match_online_helper">Popularity ${Math.round(Number(movie.popularity || 0))}</p>
                     <h3>${escapeHtml(movie.title)}</h3>
                 </div>
             </article>
@@ -659,8 +668,22 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
             dom.cardStack.innerHTML = `
                 <div class="match_online_empty_stack">
                     <p class="match_online_helper">No more movies are available with the selected providers right now.</p>
+                    <button type="button" class="action_button secondary_action" id="match_online_empty_close_room_btn">Close room</button>
                 </div>
             `;
+            const emptyCloseBtn = document.getElementById('match_online_empty_close_room_btn');
+            if (emptyCloseBtn) {
+                emptyCloseBtn.addEventListener('click', async () => {
+                    try {
+                        state.busy = true;
+                        await closeRoom();
+                    } catch (error) {
+                        setFeedback(error.message, 'error');
+                    } finally {
+                        state.busy = false;
+                    }
+                });
+            }
             bindTopCardDrag();
             return;
         }
@@ -707,8 +730,12 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
         }
         dom.overlayStatus.textContent = statusText;
 
+        const isWaitingForPartner = room.self_decision && !room.other_decision;
+        dom.decisionWaiting.hidden = !isWaitingForPartner;
+
         dom.decisionButtons.forEach((button) => {
             button.classList.toggle('active', button.getAttribute('data-match-decision') === room.self_decision);
+            button.disabled = isWaitingForPartner;
         });
     }
 
@@ -838,6 +865,24 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
         handleRoomPayload(payload.room, payload.message || 'Joined room.');
     }
 
+    async function closeRoom() {
+        if (!state.currentRoom) {
+            return;
+        }
+
+        const payload = await apiFetch('delete_match_online_room.php', {
+            method: 'POST',
+            params: {
+                room_id: state.currentRoom.id
+            }
+        });
+
+        stopRoomPolling();
+        state.currentRoom = null;
+        await loadLobby();
+        setFeedback(payload.message || 'Room closed.', 'success');
+    }
+
     async function submitDecision(decision) {
         if (!state.currentRoom) {
             return;
@@ -916,6 +961,38 @@ $apiBaseUrl = 'https://kosmicdoom.com/watchmatch_api';
         }
 
         handleRoomPayload(state.resumableRoom);
+    });
+
+    dom.closeRoomBtn.addEventListener('click', async () => {
+        try {
+            state.busy = true;
+            await closeRoom();
+        } catch (error) {
+            setFeedback(error.message, 'error');
+        } finally {
+            state.busy = false;
+        }
+    });
+
+    dom.deleteResumeBtn.addEventListener('click', async () => {
+        if (!state.resumableRoom) {
+            return;
+        }
+
+        try {
+            state.busy = true;
+            await apiFetch('delete_match_online_room.php', {
+                method: 'POST',
+                params: { room_id: state.resumableRoom.id }
+            });
+            state.resumableRoom = null;
+            await loadLobby();
+            setFeedback('Room deleted.', 'success');
+        } catch (error) {
+            setFeedback(error.message, 'error');
+        } finally {
+            state.busy = false;
+        }
     });
 
     dom.refreshRoomsBtn.addEventListener('click', async () => {

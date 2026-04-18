@@ -138,8 +138,11 @@ $navigationItems = [
 
                     <nav class="dashboard_nav">
                         <?php foreach ($navigationItems as $slug => $label): ?>
-                            <a href="?p=<?php echo htmlspecialchars($slug, ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $page === $slug ? 'is-active' : ''; ?>">
+                            <a href="?p=<?php echo htmlspecialchars($slug, ENT_QUOTES, 'UTF-8'); ?>" class="<?php echo $page === $slug ? 'is-active' : ''; ?>" <?php echo $slug === 'friends' ? 'id="nav_friends_link"' : ''; ?>>
                                 <?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
+                                <?php if ($slug === 'friends'): ?>
+                                    <span id="nav_friends_badge" class="nav_notification_badge" hidden></span>
+                                <?php endif; ?>
                             </a>
                         <?php endforeach; ?>
                     </nav>
@@ -259,6 +262,40 @@ $navigationItems = [
         });
 
         runLoginCleanup();
+
+        const friendsBadge = document.getElementById('nav_friends_badge');
+        const friendRequestApiCandidates = Array.from(new Set([
+            'https://kosmicdoom.com/watchmatch_api/get_incoming_requests_count.php',
+            window.location.origin + '/watchmatch_api/get_incoming_requests_count.php',
+            'https://www.kosmicdoom.com/watchmatch_api/get_incoming_requests_count.php'
+        ]));
+
+        async function pollFriendRequests() {
+            for (const endpoint of friendRequestApiCandidates) {
+                try {
+                    const response = await window.fetch(endpoint, {
+                        method: 'GET',
+                        credentials: 'include',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    const payload = await response.json();
+                    if (response.ok && payload && payload.success) {
+                        if (payload.count > 0) {
+                            friendsBadge.textContent = payload.count;
+                            friendsBadge.hidden = false;
+                        } else {
+                            friendsBadge.hidden = true;
+                        }
+                        return;
+                    }
+                } catch (error) {
+                    continue;
+                }
+            }
+        }
+
+        pollFriendRequests();
+        setInterval(pollFriendRequests, 15000);
     })();
     </script>
 </body>

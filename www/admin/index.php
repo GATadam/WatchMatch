@@ -457,7 +457,6 @@ foreach ($topRegions as $row) {
             <div>
                 <p class="admin_kicker">Admin dashboard</p>
                 <h1>Watchmatch platform overview</h1>
-                <p class="admin_text">Monitor growth, see which films and providers trend the most, and manage accounts from one place.</p>
             </div>
 
             <div class="admin_header_actions">
@@ -600,30 +599,112 @@ foreach ($topRegions as $row) {
                 <article class="admin_card">
                     <p class="admin_kicker">Provider usage</p>
                     <h2>Most selected providers for rooms</h2>
-                    <div class="admin_bar_chart">
-                        <?php if ($topProviders): ?>
-                            <?php foreach ($topProviders as $provider): ?>
-                                <?php $count = (int) $provider['room_count']; ?>
-                                <div class="admin_bar_row">
-                                    <div class="admin_bar_label">
-                                        <span class="admin_provider_row">
-                                            <?php $providerLogo = watchmatchResolveMediaUrl((string) $provider['logo']); ?>
-                                            <?php if ($providerLogo !== ''): ?>
-                                                <img class="admin_provider_logo" src="<?php echo htmlspecialchars($providerLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="">
-                                            <?php endif; ?>
-                                            <span><?php echo htmlspecialchars((string) $provider['name'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                        </span>
-                                        <span><?php echo number_format($count); ?></span>
+                    <?php if ($topProviders): ?>
+                        <?php
+                        $providerColorMap = [
+                            'netflix' => '#e50914',
+                            'disney plus' => '#1d6dce',
+                            'disney+' => '#1d6dce',
+                            'hbo max' => '#1a1a2e',
+                            'hbo' => '#1a1a2e',
+                            'max' => '#1a1a2e',
+                            'amazon prime video' => '#f0f0f0',
+                            'prime video' => '#f0f0f0',
+                        ];
+                        $fallbackColors = ['#2ac6d9', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+                        $fallbackIndex = 0;
+
+                        $totalRoomCount = 0;
+                        foreach ($topProviders as $p) {
+                            $totalRoomCount += (int) $p['room_count'];
+                        }
+
+                        $providerSlices = [];
+                        foreach ($topProviders as $p) {
+                            $name = (string) $p['name'];
+                            $nameLower = strtolower(trim($name));
+                            if (isset($providerColorMap[$nameLower])) {
+                                $color = $providerColorMap[$nameLower];
+                            } else {
+                                $color = $fallbackColors[$fallbackIndex % count($fallbackColors)];
+                                $fallbackIndex++;
+                            }
+                            $providerSlices[] = [
+                                'name' => $name,
+                                'count' => (int) $p['room_count'],
+                                'logo' => (string) $p['logo'],
+                                'color' => $color,
+                            ];
+                        }
+                        ?>
+                        <?php
+                        function adminAdjustHex(string $hex, int $pct): string {
+                            $hex = ltrim($hex, '#');
+                            if (strlen($hex) === 3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+                            $r = hexdec(substr($hex,0,2));
+                            $g = hexdec(substr($hex,2,2));
+                            $b = hexdec(substr($hex,4,2));
+                            if ($pct > 0) {
+                                $r += (int)((255-$r)*$pct/100);
+                                $g += (int)((255-$g)*$pct/100);
+                                $b += (int)((255-$b)*$pct/100);
+                            } else {
+                                $r = (int)($r*(100+$pct)/100);
+                                $g = (int)($g*(100+$pct)/100);
+                                $b = (int)($b*(100+$pct)/100);
+                            }
+                            return sprintf('#%02x%02x%02x', max(0,min(255,$r)), max(0,min(255,$g)), max(0,min(255,$b)));
+                        }
+                        ?>
+                        <div class="admin_pie_container">
+                            <svg class="admin_pie_svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <?php foreach ($providerSlices as $gi => $gs): ?>
+                                        <linearGradient id="pie-grad-<?php echo $gi; ?>" x1="0" y1="0" x2="1" y2="1">
+                                            <stop offset="0%"   stop-color="<?php echo adminAdjustHex($gs['color'], 25); ?>"/>
+                                            <stop offset="100%" stop-color="<?php echo adminAdjustHex($gs['color'], -20); ?>"/>
+                                        </linearGradient>
+                                    <?php endforeach; ?>
+                                </defs>
+                                <?php
+                                $cumulative = 0;
+                                foreach ($providerSlices as $si => $slice):
+                                    $fraction = $totalRoomCount > 0 ? $slice['count'] / $totalRoomCount : 0;
+                                    $dashArray = $fraction * 314.159;
+                                    $dashOffset = -$cumulative * 314.159;
+                                    $cumulative += $fraction;
+                                ?>
+                                    <circle
+                                        cx="100" cy="100" r="50"
+                                        fill="none"
+                                        stroke="url(#pie-grad-<?php echo $si; ?>)"
+                                        stroke-width="58"
+                                        stroke-dasharray="<?php echo number_format($dashArray, 4, '.', ''); ?> 314.1593"
+                                        stroke-dashoffset="<?php echo number_format($dashOffset, 4, '.', ''); ?>"
+                                        transform="rotate(-90 100 100)"
+                                    />
+                                <?php endforeach; ?>
+                                <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(42,198,217,0.30)" stroke-width="1.2"/>
+                                <circle cx="100" cy="100" r="21" fill="none" stroke="rgba(42,198,217,0.30)" stroke-width="1.2"/>
+                            </svg>
+                            <div class="admin_pie_legend">
+                                <?php foreach ($providerSlices as $slice): ?>
+                                    <?php $logoUrl = watchmatchResolveMediaUrl($slice['logo']); ?>
+                                    <div class="admin_pie_legend_item">
+                                        <span class="admin_pie_legend_dot" style="background: <?php echo htmlspecialchars($slice['color'], ENT_QUOTES, 'UTF-8'); ?>;<?php echo strtolower(trim($slice['color'])) === '#f0f0f0' || strtolower(trim($slice['color'])) === '#ffffff' ? ' border: 1px solid rgba(148,163,184,0.4);' : ''; ?>"></span>
+                                        <?php if ($logoUrl !== ''): ?>
+                                            <img class="admin_pie_legend_logo" src="<?php echo htmlspecialchars($logoUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($slice['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <?php else: ?>
+                                            <span class="admin_pie_legend_name"><?php echo htmlspecialchars($slice['name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <?php endif; ?>
+                                        <span class="admin_pie_legend_count">(<?php echo number_format($slice['count']); ?>)</span>
                                     </div>
-                                    <div class="admin_bar_track">
-                                        <div class="admin_bar_fill" style="width: <?php echo number_format(adminPercentageWidth($count, $maxProviderRoomCount), 2, '.', ''); ?>%;"></div>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="admin_text">No provider selections have been recorded yet.</p>
-                        <?php endif; ?>
-                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <p class="admin_text" style="margin-top:18px;">No provider selections have been recorded yet.</p>
+                    <?php endif; ?>
                 </article>
             </div>
 

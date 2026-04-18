@@ -191,7 +191,19 @@ function h($value)
         `;
     }
 
+    const friendActionMeta = {
+        send_request:   { icon: '\u002B', cls: 'friend_btn--add',      title: 'Add friend' },
+        accept_request: { icon: '\u2713', cls: 'friend_btn--accept',   title: 'Accept' },
+        decline_request:{ icon: '\u2715', cls: 'friend_btn--decline',  title: 'Decline' },
+        cancel_request: { icon: '\u2715', cls: 'friend_btn--cancel',   title: 'Cancel request' },
+        remove_friend:  { icon: '\u2715', cls: 'friend_btn--unfriend', title: 'Unfriend' },
+    };
+
     function actionButtonHtml(action, label, secondary = false, userId = 0) {
+        const meta = friendActionMeta[action];
+        if (meta) {
+            return `<button type="button" class="friend_btn ${meta.cls}" data-friend-action="${escapeHtml(action)}" data-user-id="${Number(userId)}" title="${escapeHtml(meta.title)}" aria-label="${escapeHtml(meta.title)}">${meta.icon}</button>`;
+        }
         const classes = secondary ? 'action_button secondary_action' : 'action_button';
         return `<button type="button" class="${classes}" data-friend-action="${escapeHtml(action)}" data-user-id="${Number(userId)}">${escapeHtml(label)}</button>`;
     }
@@ -368,5 +380,13 @@ function h($value)
             renderSearchResults();
         }
     })();
+
+    setInterval(async () => {
+        try {
+            await loadAllData();
+        } catch (error) {
+            // silent – don't overwrite user-facing feedback on background poll failure
+        }
+    }, 10000);
 })();
 </script>

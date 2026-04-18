@@ -372,7 +372,7 @@ function matchOnlineGetMovieProvidersForRoom(PDO $pdo, int $movieId, array $room
     );
 }
 
-function matchOnlineGetRankedCandidateMovies(PDO $pdo, array $room, int $userId, ?int $otherUserId): array
+function matchOnlineGetRankedCandidateMovies(PDO $pdo, array $room, int $userId, ?int $otherUserId, array $excludeMovieIds = []): array
 {
     $providers = matchOnlineGetRoomProviders($pdo, (int) $room['id']);
     if (!$providers) {
@@ -409,9 +409,12 @@ function matchOnlineGetRankedCandidateMovies(PDO $pdo, array $room, int $userId,
     $selfMap = matchOnlineGetWatchedMovieMap($pdo, $userId);
     $otherMap = matchOnlineGetWatchedMovieMap($pdo, $otherUserId);
 
-    $ranked = [];
+    // Build the eligible pool (watched filter applied, but swiped NOT excluded yet
+    // so that batch boundaries stay stable regardless of swipe progress)
+    $eligible = [];
     foreach ($movies as $movie) {
         $movieId = (int) $movie['id'];
+
         $selfWatched = isset($selfMap[$movieId]);
         $otherWatched = isset($otherMap[$movieId]);
 
@@ -430,36 +433,43 @@ function matchOnlineGetRankedCandidateMovies(PDO $pdo, array $room, int $userId,
         $movie['id'] = $movieId;
         $movie['tmdb_id'] = (int) $movie['tmdb_id'];
         $movie['popularity'] = (float) $movie['popularity'];
-        $movie['_shuffle'] = hexdec(substr(hash('sha256', (string) $room['id'] . ':user:' . (string) $userId . ':' . (string) $movieId), 0, 8));
-        $ranked[] = $movie;
+        $eligible[] = $movie;
+    }
 
-        if (count($ranked) >= 100) {
-            break;
+    // Split into batches of 100 ordered by popularity (from the SQL ORDER BY).
+    // Within each batch, shuffle with a per-user deterministic hash.
+    // This way users get the most popular movies first, but in a unique order.
+    $batches = array_chunk($eligible, 100);
+    $result = [];
+
+    $sortFn = static function (array $a, array $b): int {
+        if ($a['_shuffle'] !== $b['_shuffle']) {
+            return $a['_shuffle'] <=> $b['_shuffle'];
+        }
+        if ($a['popularity'] !== $b['popularity']) {
+            return $b['popularity'] <=> $a['popularity'];
+        }
+        return $a['id'] <=> $b['id'];
+    };
+
+    foreach ($batches as $batch) {
+        foreach ($batch as &$m) {
+            $m['_shuffle'] = hexdec(substr(hash('sha256', (string) $room['id'] . ':user:' . (string) $userId . ':' . (string) $m['id']), 0, 8));
+        }
+        unset($m);
+
+        usort($batch, $sortFn);
+
+        foreach ($batch as $movie) {
+            if (isset($excludeMovieIds[$movie['id']])) {
+                continue;
+            }
+            unset($movie['_shuffle']);
+            $result[] = $movie;
         }
     }
 
-    usort(
-        $ranked,
-        static function (array $a, array $b): int {
-            if ($a['_shuffle'] !== $b['_shuffle']) {
-                return $a['_shuffle'] <=> $b['_shuffle'];
-            }
-
-            if ($a['popularity'] !== $b['popularity']) {
-                return $b['popularity'] <=> $a['popularity'];
-            }
-
-            return $a['id'] <=> $b['id'];
-        }
-    );
-
-    return array_map(
-        static function (array $movie): array {
-            unset($movie['_shuffle']);
-            return $movie;
-        },
-        $ranked
-    );
+    return $result;
 }
 
 function matchOnlineGetNextMovies(PDO $pdo, array $room, int $userId, int $limit = 3): array
@@ -483,13 +493,9 @@ function matchOnlineGetNextMovies(PDO $pdo, array $room, int $userId, int $limit
         $swipedMovieIds[(int) $row['movie_id']] = true;
     }
 
-    $candidateMovies = matchOnlineGetRankedCandidateMovies($pdo, $room, $userId, $otherUserId);
+    $candidateMovies = matchOnlineGetRankedCandidateMovies($pdo, $room, $userId, $otherUserId, $swipedMovieIds);
     $nextMovies = [];
     foreach ($candidateMovies as $movie) {
-        if (isset($swipedMovieIds[(int) $movie['id']])) {
-            continue;
-        }
-
         $nextMovies[] = $movie;
         if (count($nextMovies) >= $limit) {
             break;
