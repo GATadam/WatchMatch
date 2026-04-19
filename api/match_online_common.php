@@ -409,8 +409,6 @@ function matchOnlineGetRankedCandidateMovies(PDO $pdo, array $room, int $userId,
     $selfMap = matchOnlineGetWatchedMovieMap($pdo, $userId);
     $otherMap = matchOnlineGetWatchedMovieMap($pdo, $otherUserId);
 
-    // Build the eligible pool (watched filter applied, but swiped NOT excluded yet
-    // so that batch boundaries stay stable regardless of swipe progress)
     $eligible = [];
     foreach ($movies as $movie) {
         $movieId = (int) $movie['id'];
@@ -436,9 +434,6 @@ function matchOnlineGetRankedCandidateMovies(PDO $pdo, array $room, int $userId,
         $eligible[] = $movie;
     }
 
-    // Split into batches of 100 ordered by popularity (from the SQL ORDER BY).
-    // Within each batch, shuffle with a per-user deterministic hash.
-    // This way users get the most popular movies first, but in a unique order.
     $batches = array_chunk($eligible, 100);
     $result = [];
 

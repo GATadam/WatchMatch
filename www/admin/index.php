@@ -17,6 +17,7 @@ $providersTable = getenv('DB_TABLE_P') ?: 'Providers';
 $w2wTable = getenv('DB_TABLE_W2W') ?: 'Where_to_watch';
 $friendsTable = getenv('DB_TABLE_F') ?: 'Friends';
 $watchedMoviesTable = 'Watched_movies';
+$matchOnlineSwipesTable = 'Match_online_room_swipes';
 
 function adminRedirect(string $query = ''): void
 {
@@ -344,6 +345,20 @@ $topMovies = adminFetchAll(
     "
 );
 
+$topDislikedMovies = adminFetchAll(
+    $pdo,
+    "
+    SELECT m.id, m.title, m.picture, m.popularity, COUNT(mors.id) AS dislike_count
+    FROM {$moviesTable} m
+    INNER JOIN {$matchOnlineSwipesTable} mors
+        ON mors.movie_id = m.id
+    WHERE mors.swipe = 'left'
+    GROUP BY m.id, m.title, m.picture, m.popularity
+    ORDER BY dislike_count DESC, m.popularity DESC, m.id DESC
+    LIMIT 6
+    "
+);
+
 $topProviders = adminFetchAll(
     $pdo,
     "
@@ -421,6 +436,11 @@ $users = adminFetchAll($pdo, $searchSql, $searchParams);
 $maxTopMovieCount = 0;
 foreach ($topMovies as $row) {
     $maxTopMovieCount = max($maxTopMovieCount, (int) $row['watch_count']);
+}
+
+$maxTopDislikedMovieCount = 0;
+foreach ($topDislikedMovies as $row) {
+    $maxTopDislikedMovieCount = max($maxTopDislikedMovieCount, (int) $row['dislike_count']);
 }
 
 $maxProviderRoomCount = 0;
@@ -592,6 +612,37 @@ foreach ($topRegions as $row) {
                             <?php endforeach; ?>
                         <?php else: ?>
                             <p class="admin_text">No watched movie data is available yet.</p>
+                        <?php endif; ?>
+                    </div>
+                </article>
+
+                <article class="admin_card">
+                    <p class="admin_kicker">Swipe activity</p>
+                    <h2>Most disliked movies</h2>
+                    <div class="admin_movie_grid">
+                        <?php if ($topDislikedMovies): ?>
+                            <?php foreach ($topDislikedMovies as $movie): ?>
+                                <article class="admin_movie_card">
+                                    <div class="admin_movie_poster">
+                                        <?php $posterUrl = watchmatchResolveMediaUrl((string) $movie['picture']); ?>
+                                        <?php if ($posterUrl !== ''): ?>
+                                            <img src="<?php echo htmlspecialchars($posterUrl, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars((string) $movie['title'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="admin_movie_content">
+                                        <h3 class="admin_movie_title"><?php echo htmlspecialchars((string) $movie['title'], ENT_QUOTES, 'UTF-8'); ?></h3>
+                                        <div class="admin_bar_track">
+                                            <div class="admin_bar_fill" style="width: <?php echo number_format(adminPercentageWidth((int) $movie['dislike_count'], $maxTopDislikedMovieCount), 2, '.', ''); ?>%;"></div>
+                                        </div>
+                                        <div class="admin_stat_row">
+                                            <span>Left swipes</span>
+                                            <strong><?php echo number_format((int) $movie['dislike_count']); ?></strong>
+                                        </div>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="admin_text">No disliked movie data is available yet.</p>
                         <?php endif; ?>
                     </div>
                 </article>

@@ -385,7 +385,7 @@ function h($value)
         try {
             await loadAllData();
         } catch (error) {
-            // silent – don't overwrite user-facing feedback on background poll failure
+
         }
     }, 10000);
 })();
