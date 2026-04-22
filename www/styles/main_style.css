@@ -35,8 +35,7 @@ body {
     font-weight: 700;
     font-size: clamp(15px, 0.5vw + 14px, 18px);
     cursor: pointer;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-    -webkit-text-stroke: 0.5px #555;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
 }
 
 .btn:hover {
